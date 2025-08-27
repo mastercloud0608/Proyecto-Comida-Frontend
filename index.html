@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comida Sobrante en Línea</title>
+    <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Comida Sobrante</h1>
+            <p>A precios reducidos, en buen estado</p>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#">Inicio</a></li>
+                <li><a href="#">Productos</a></li>
+                <li><a href="#">Cómo Funciona</a></li>
+                <li><a href="#">Contáctanos</a></li>
+                <li><a href="login/login.html" id="login-link">Iniciar Sesión</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h2>¡Disfruta comida deliciosa y económica!</h2>
+        <p>Reduce el desperdicio y ahorra comprando comida en buen estado a precios más bajos.</p>
+        <a href="#" class="btn">Ver productos</a>
+    </section>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Iniciar Sesión</h2>
+            <form id="login-form">
+                <label for="username">Nombre de Usuario</label>
+                <input type="text" id="username" name="username" required>
+
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" name="password" required>
+
+                <button type="submit" class="btn">Iniciar sesión</button>
+            </form>
+            <p>¿No tienes cuenta? <a href="#" id="register-link">Regístrate aquí</a></p>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="register-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Registrar Nueva Cuenta</h2>
+            <form id="register-form">
+                <label for="new-username">Nombre de Usuario</label>
+                <input type="text" id="new-username" name="username" required>
+
+                <label for="new-password">Contraseña</label>
+                <input type="password" id="new-password" name="password" required>
+
+                <button type="submit" class="btn">Registrar</button>
+            </form>
+        </div>
+    </div>
+
+    <section class="benefits">
+        <h2>¿Por qué elegirnos?</h2>
+        <div class="benefit">
+            <h3>Ahorra dinero</h3>
+            <p>Comida deliciosa a precios accesibles, perfecta para tu bolsillo.</p>
+        </div>
+        <div class="benefit">
+            <h3>Ayuda al medio ambiente</h3>
+            <p>Contribuye a reducir el desperdicio de alimentos.</p>
+        </div>
+        <div class="benefit">
+            <h3>Apoya la economía circular</h3>
+            <p>Compra alimentos de calidad, ayudando a los negocios locales.</p>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Comida Sobrante. Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="login.js"></script>
+</body>
+</html>
