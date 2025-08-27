@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Pedidos - Comida Sobrante</title>
+    <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <h1>Comida Sobrante</h1>
+            <p>Reduciendo el desperdicio, alimentando el futuro</p>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="comida.html">Comidas</a></li>
+                <li><a href="pedidos.html">Pedidos</a></li>
+                <li><a href="#" onclick="mostrarFormularioNuevoPedido()">Nuevo Pedido</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h2>Gestión de Pedidos</h2>
+        <p>Administra todos los pedidos de la plataforma</p>
+    </section>
+
+    <!-- Estadísticas -->
+    <section class="filters">
+        <div class="filter-container">
+            <div class="estadisticas-resumen" id="estadisticasResumen">
+                <div class="stat-item">
+                    <span class="stat-number" id="totalPedidos">0</span>
+                    <span class="stat-label">Total Pedidos</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="pedidosHoy">0</span>
+                    <span class="stat-label">Pedidos Hoy</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="ventasHoy">Bs 0</span>
+                    <span class="stat-label">Ventas Hoy</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filtros -->
+    <section class="filters">
+        <div class="filter-container">
+            <h3>Filtrar Pedidos</h3>
+            <select id="filtroEstado">
+                <option value="">Todos los estados</option>
+                <option value="pendiente">Pendiente</option>
+                <option value="confirmado">Confirmado</option>
+                <option value="en-preparacion">En Preparación</option>
+                <option value="listo">Listo</option>
+                <option value="entregado">Entregado</option>
+                <option value="cancelado">Cancelado</option>
+            </select>
+            <input type="text" id="filtroCliente" placeholder="Buscar por cliente...">
+            <button onclick="filtrarPedidos()">Filtrar</button>
+            <button onclick="cargarPedidos()">Mostrar Todos</button>
+        </div>
+    </section>
+
+    <!-- Formulario para nuevo pedido -->
+    <section class="pedidos-section" id="nuevoPedidoSection" style="display: none;">
+        <div class="nuevo-pedido-form">
+            <h3>Crear Nuevo Pedido</h3>
+            <form id="formNuevoPedido">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="comidaSelect">Comida:</label>
+                        <select id="comidaSelect" name="comida_id" required>
+                            <option value="">Selecciona una comida...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="cantidad">Cantidad:</label>
+                        <input type="number" id="cantidad" name="cantidad" min="1" value="1" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nombreCliente">Nombre del Cliente:</label>
+                        <input type="text" id="nombreCliente" name="nombre_cliente" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="emailCliente">Email:</label>
+                        <input type="email" id="emailCliente" name="email_cliente" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="telefonoCliente">Teléfono:</label>
+                        <input type="tel" id="telefonoCliente" name="telefono_cliente">
+                    </div>
+                    <div class="form-group">
+                        <label for="direccion">Dirección:</label>
+                        <input type="text" id="direccion" name="direccion">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="notas">Notas Adicionales:</label>
+                    <textarea id="notas" name="notas" placeholder="Instrucciones especiales, alergias, etc."></textarea>
+                </div>
+                
+                <div class="precio-preview">
+                    <strong>Precio Total: Bs <span id="precioTotal">0.00</span></strong>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit">Crear Pedido</button>
+                    <button type="button" onclick="ocultarFormularioNuevoPedido()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Lista de Pedidos -->
+    <section class="pedidos-section">
+        <div class="comidas-header">
+            <h2>Lista de Pedidos</h2>
+            <div class="loading" id="loading" style="display: none;">Cargando...</div>
+        </div>
+        <div class="pedidos-grid" id="pedidosContainer">
+            <!-- Los pedidos se cargarán dinámicamente aquí -->
+        </div>
+    </section>
+
+    <!-- Modal para editar pedido -->
+    <div id="modalEditarPedido" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarModalEditar()">&times;</span>
+            <h2>Editar Pedido</h2>
+            <form id="formEditarPedido">
+                <div class="form-group">
+                    <label for="editNombreCliente">Nombre del Cliente:</label>
+                    <input type="text" id="editNombreCliente" name="nombre_cliente" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editEmailCliente">Email:</label>
+                    <input type="email" id="editEmailCliente" name="email_cliente" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editTelefonoCliente">Teléfono:</label>
+                    <input type="tel" id="editTelefonoCliente" name="telefono_cliente">
+                </div>
+                
+                <div class="form-group">
+                    <label for="editDireccion">Dirección:</label>
+                    <input type="text" id="editDireccion" name="direccion">
+                </div>
+                
+                <div class="form-group">
+                    <label for="editCantidad">Cantidad:</label>
+                    <input type="number" id="editCantidad" name="cantidad" min="1" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editEstado">Estado:</label>
+                    <select id="editEstado" name="estado">
+                        <option value="pendiente">Pendiente</option>
+                        <option value="confirmado">Confirmado</option>
+                        <option value="en-preparacion">En Preparación</option>
+                        <option value="listo">Listo</option>
+                        <option value="entregado">Entregado</option>
+                        <option value="cancelado">Cancelado</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editNotas">Notas:</label>
+                    <textarea id="editNotas" name="notas"></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit">Actualizar Pedido</button>
+                    <button type="button" onclick="cerrarModalEditar()">Cancelar</button>
+                </div>
+                
+                <input type="hidden" id="editPedidoId">
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 Comida Sobrante. Proyecto de Responsabilidad Social - Unidad Educativa Padre Jaime Gagnon 1</p>
+    </footer>
+
+    <script>
+        let pedidos = [];
+        let comidas = [];
+        let editandoPedidoId = null;
+
+        // Cargar datos al iniciar
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarPedidos();
+            cargarComidas();
+            cargarEstadisticas();
+            
+            // Verificar si hay un parámetro de comida en la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const comidaId = urlParams.get('comida');
+            if (comidaId) {
+                mostrarFormularioNuevoPedido();
+                document.getElementById('comidaSelect').value = comidaId;
+                calcularPrecioTotal();
+            }
+        });
+
+        // Cargar todas las comidas para el selector
+        async function cargarComidas() {
+            try {
+                const response = await fetch('/api/comidas');
+                if (!response.ok) throw new Error('Error al cargar comidas');
+                
+                comidas = await response.json();
+                const select = document.getElementById('comidaSelect');
+                
+                comidas.forEach(comida => {
+                    const option = document.createElement('option');
+                    option.value = comida.id;
+                    option.textContent = `${comida.nombre} - Bs ${parseFloat(comida.precio).toFixed(2)}`;
+                    option.dataset.precio = comida.precio;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarMensaje('Error al cargar las comidas', 'error');
+            }
+        }
+
+        // Cargar todos los pedidos
+        async function cargarPedidos() {
+            try {
+                mostrarLoading(true);
+                const response = await fetch('/api/pedidos');
+                if (!response.ok) throw new Error('Error al cargar pedidos');
+                
+                pedidos = await response.json();
+                mostrarPedidos(pedidos);
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarMensaje('Error al cargar los pedidos', 'error');
+            } finally {
+                mostrarLoading(false);
+            }
+        }
+
+        // Cargar estadísticas
+        async function cargarEstadisticas() {
+            try {
+                const response = await fetch('/api/pedidos/estadisticas/resumen');
+                if (!response.ok) throw new Error('Error al cargar estadísticas');
+                
+                const stats = await response.json();
+                document.getElementById('totalPedidos').textContent = stats.total_pedidos;
+                document.getElementById('pedidosHoy').textContent = stats.estadisticas_hoy.pedidos_hoy;
+                document.getElementById('ventasHoy').textContent = `Bs ${parseFloat(stats.estadisticas_hoy.ventas_hoy).toFixed(2)}`;
+            } catch (error) {
+                console.error('Error al cargar estadísticas:', error);
+            }
+        }
+
+        // Mostrar pedidos en el grid
+        function mostrarPedidos(pedidosArray) {
+            const container = document.getElementById('pedidosContainer');
+            
+            if (pedidosArray.length === 0) {
+                container.innerHTML = '<div class="no-results">No hay pedidos disponibles</div>';
+                return;
+            }
+
+            container.innerHTML = pedidosArray.map(pedido => `
+                <div class="pedido-card">
+                    <div class="pedido-header">
+                        <div class="pedido-id">Pedido #${pedido.id}</div>
+                        <span class="estado-badge ${pedido.estado}">${pedido.estado.replace('-', ' ')}</span>
+                    </div>
+                    <div class="pedido-info">
+                        <p><strong>Cliente:</strong> ${pedido.nombre_cliente}</p>
+                        <p><strong>Email:</strong> ${pedido.email_cliente}</p>
+                        <p><strong>Teléfono:</strong> ${pedido.telefono_cliente || 'No proporcionado'}</p>
+                        <p><strong>Comida:</strong> ${pedido.nombre_comida}</p>
+                        <p><strong>Categoría:</strong> ${pedido.categoria_comida}</p>
+                        <p><strong>Cantidad:</strong> ${pedido.cantidad}</p>
+                        <p><strong>Total:</strong> Bs ${parseFloat(pedido.precio_total).toFixed(2)}</p>
+                        <p><strong>Fecha:</strong> ${new Date(pedido.fecha_pedido).toLocaleString()}</p>
+                        ${pedido.notas ? `<p><strong>Notas:</strong> ${pedido.notas}</p>` : ''}
+                    </div>
+                    <div class="pedido-actions">
+                        <button class="btn-actualizar" onclick="editarPedido(${pedido.id})">Editar</button>
+                        ${pedido.estado === 'pendiente' ? `
+                            <button class="btn-confirmar" onclick="cambiarEstado(${pedido.id}, 'confirmado')">Confirmar</button>
+                        ` : ''}
+                        ${pedido.estado === 'confirmado' ? `
+                            <button class="btn-confirmar" onclick="cambiarEstado(${pedido.id}, 'en-preparacion')">En Preparación</button>
+                        ` : ''}
+                        ${pedido.estado === 'en-preparacion' ? `
+                            <button class="btn-confirmar" onclick="cambiarEstado(${pedido.id}, 'listo')">Marcar Listo</button>
+                        ` : ''}
+                        ${pedido.estado === 'listo' ? `
+                            <button class="btn-confirmar" onclick="cambiarEstado(${pedido.id}, 'entregado')">Entregado</button>
+                        ` : ''}
+                        ${['pendiente', 'confirmado'].includes(pedido.estado) ? `
+                            <button class="btn-cancelar" onclick="cambiarEstado(${pedido.id}, 'cancelado')">Cancelar</button>
+                        ` : ''}
+                        <button class="btn-cancelar" onclick="eliminarPedido(${pedido.id})">Eliminar</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Filtrar pedidos
+        function filtrarPedidos() {
+            const filtroEstado = document.getElementById('filtroEstado').value;
+            const filtroCliente = document.getElementById('filtroCliente').value.toLowerCase();
+            
+            let pedidosFiltrados = pedidos;
+
+            if (filtroEstado) {
+                pedidosFiltrados = pedidosFiltrados.filter(pedido => 
+                    pedido.estado === filtroEstado
+                );
+            }
+
+            if (filtroCliente) {
+                pedidosFiltrados = pedidosFiltrados.filter(pedido => 
+                    pedido.nombre_cliente.toLowerCase().includes(filtroCliente) ||
+                    pedido.email_cliente.toLowerCase().includes(filtroCliente)
+                );
+            }
+
+            mostrarPedidos(pedidosFiltrados);
+        }
+
+        // Mostrar formulario para nuevo pedido
+        function mostrarFormularioNuevoPedido() {
+            document.getElementById('nuevoPedidoSection').style.display = 'block';
+            document.getElementById('nuevoPedidoSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Ocultar formulario para nuevo pedido
+        function ocultarFormularioNuevoPedido() {
+            document.getElementById('nuevoPedidoSection').style.display = 'none';
+            document.getElementById('formNuevoPedido').reset();
+            document.getElementById('precioTotal').textContent = '0.00';
+        }
+
+        // Calcular precio total
+        function calcularPrecioTotal() {
+            const select = document.getElementById('comidaSelect');
+            const cantidad = parseInt(document.getElementById('cantidad').value) || 1;
+            const selectedOption = select.selectedOptions[0];
+            
+            if (selectedOption && selectedOption.dataset.precio) {
+                const precioUnitario = parseFloat(selectedOption.dataset.precio);
+                const total = precioUnitario * cantidad;
+                document.getElementById('precioTotal').textContent = total.toFixed(2);
+            } else {
+                document.getElementById('precioTotal').textContent = '0.00';
+            }
+        }
+
+        // Event listeners para calcular precio
+        document.getElementById('comidaSelect').addEventListener('change', calcularPrecioTotal);
+        document.getElementById('cantidad').addEventListener('input', calcularPrecioTotal);
+
+        // Manejar envío del formulario de nuevo pedido
+        document.getElementById('formNuevoPedido').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const pedidoData = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/api/pedidos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(pedidoData)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.mensaje || 'Error al crear pedido');
+                }
+
+                mostrarMensaje('Pedido creado exitosamente', 'success');
+                ocultarFormularioNuevoPedido();
+                cargarPedidos();
+                cargarEstadisticas();
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarMensaje('Error al crear el pedido: ' + error.message, 'error');
+            }
+        });
+
+        // Función para editar pedido
+        function editarPedido(id) {
+            const pedido = pedidos.find(p => p.id === id);
+            if (!pedido) return;
+
+            // Llenar el formulario de edición
+            document.getElementById('editPedidoId').value = pedido.id;
+            document.getElementById('editNombreCliente').value = pedido.nombre_cliente;
+            document.getElementById('editEmailCliente').value = pedido.email_cliente;
+            document.getElementById('editTelefonoCliente').value = pedido.telefono_cliente || '';
+            document.getElementById('editDireccion').value = pedido.direccion || '';
+            document.getElementById('editCantidad').value = pedido.cantidad;
+            document.getElementById('editEstado').value = pedido.estado;
+            document.getElementById('editNotas').value = pedido.notas || '';
+
+            editandoPedidoId = id;
+            document.getElementById('modalEditarPedido').style.display = 'block';
+        }
+
+        // Cerrar modal de edición
+        function cerrarModalEditar() {
+            document.getElementById('modalEditarPedido').style.display = 'none';
+            document.getElementById('formEditarPedido').reset();
+            editandoPedidoId = null;
+        }
+
+        // Manejar envío del formulario de edición
+        document.getElementById('formEditarPedido').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!editandoPedidoId) return;
+
+            const formData = new FormData(this);
+            const pedidoData = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch(`/api/pedidos/${editandoPedidoId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(pedidoData)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.mensaje || 'Error al actualizar pedido');
+                }
+
+                mostrarMensaje('Pedido actualizado exitosamente', 'success');
+                cerrarModalEditar();
+                cargarPedidos();
+                cargarEstadisticas();
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarMensaje('Error al actualizar el pedido: ' + error.message, 'error');
+            }
+        });
+
+        // Cambiar estado de pedido
+        async function cambiarEstado(id, nuevoEstado) {
+            try {
+                const response = await fetch(`/api/pedidos/${id}/estado`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ estado: nuevoEstado })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.mensaje || 'Error al cambiar estado');
+                }
+
+                mostrarMensaje(`Estado cambiado a ${nuevoEstado}`, 'success');
+                cargarPedidos();
+                cargarEstadisticas();
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarMensaje('Error al cambiar el estado: ' + error.message, 'error');
+            }
+        }
+
+        // Eliminar pedido
+        async function eliminarPedido(id) {
+            if (!confirm('¿Estás seguro de que quieres eliminar este pedido?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/pedidos/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.mensaje || 'Error al eliminar pedido');
+                }
+
+                mostrarMensaje('Pedido eliminado exitosamente', 'success');
+                cargarPedidos();
+                cargarEstadisticas();
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarMensaje('Error al eliminar el pedido: ' + error.message, 'error');
+            }
+        }
+
+        // Función para mostrar loading
+        function mostrarLoading(mostrar) {
+            const loading = document.getElementById('loading');
+            loading.style.display = mostrar ? 'block' : 'none';
+        }
+
+        // Función para mostrar mensajes
+        function mostrarMensaje(mensaje, tipo = 'info') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert ${tipo}`;
+            alertDiv.textContent = mensaje;
+            
+            // Insertar al inicio del body
+            document.body.insertBefore(alertDiv, document.body.firstChild);
+            
+            // Remover después de 4 segundos
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 4000);
+        }
+
+        // Cerrar modales al hacer click fuera
+        window.onclick = function(event) {
+            const modalEditar = document.getElementById('modalEditarPedido');
+            if (event.target === modalEditar) {
+                cerrarModalEditar();
+            }
+        }
+
+        // Actualizar automáticamente cada 30 segundos
+        setInterval(() => {
+            cargarPedidos();
+            cargarEstadisticas();
+        }, 30000);
+    </script>
+
+</body>
+</html>

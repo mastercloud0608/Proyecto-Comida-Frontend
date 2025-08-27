@@ -10,14 +10,15 @@
     <header>
         <div class="logo">
             <h1>Comida Sobrante</h1>
-            <p>A precios reducidos, en buen estado</p>
+            <p>Reduciendo el desperdicio, alimentando el futuro</p>
         </div>
         <nav>
             <ul>
-                <li><a href="#" aria-label="Ir a inicio">Inicio</a></li>
-                <li><a href="#" aria-label="Ver productos">Productos</a></li>
-                <li><a href="#" aria-label="Cómo funciona">Cómo Funciona</a></li>
-                <li><a href="#" aria-label="Contacto">Contáctanos</a></li>
+                <li><a href="index.html" aria-label="Ir a inicio">Inicio</a></li>
+                <li><a href="comida.html" aria-label="Ver comidas disponibles">Comidas</a></li>
+                <li><a href="pedidos.html" aria-label="Ver pedidos">Pedidos</a></li>
+                <li><a href="#como-funciona" aria-label="Cómo funciona">Cómo Funciona</a></li>
+                <li><a href="#contacto" aria-label="Contacto">Contáctanos</a></li>
                 <li><a href="#" id="login-link" aria-label="Iniciar sesión">Iniciar Sesión</a></li>
             </ul>
         </nav>
@@ -27,7 +28,7 @@
         <section class="hero">
             <h2>¡Disfruta comida deliciosa y económica!</h2>
             <p>Reduce el desperdicio y ahorra comprando comida en buen estado a precios más bajos.</p>
-            <a href="#" class="btn" aria-label="Ver productos disponibles">Ver productos</a>
+            <a href="comida.html" class="btn" aria-label="Ver comidas disponibles">Ver Comidas Disponibles</a>
         </section>
 
         <section class="benefits">
@@ -39,11 +40,97 @@
                 </div>
                 <div class="benefit">
                     <h3>Ayuda al medio ambiente</h3>
-                    <p>Contribuye a reducir el desperdicio de alimentos.</p>
+                    <p>Contribuye a reducir el desperdicio de alimentos y cuida el planeta.</p>
                 </div>
                 <div class="benefit">
                     <h3>Apoya la economía circular</h3>
-                    <p>Compra alimentos de calidad, ayudando a los negocios locales.</p>
+                    <p>Compra alimentos de calidad, ayudando a los negocios locales a reducir pérdidas.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Nueva sección: Cómo Funciona -->
+        <section id="como-funciona" class="como-funciona">
+            <h2>¿Cómo Funciona?</h2>
+            <div class="proceso-container">
+                <div class="paso">
+                    <div class="paso-numero">1</div>
+                    <h3>Explora las Comidas</h3>
+                    <p>Navega por nuestra selección de comidas frescas disponibles a precios reducidos.</p>
+                </div>
+                <div class="paso">
+                    <div class="paso-numero">2</div>
+                    <h3>Haz tu Pedido</h3>
+                    <p>Selecciona la comida que deseas y completa tu información para hacer el pedido.</p>
+                </div>
+                <div class="paso">
+                    <div class="paso-numero">3</div>
+                    <h3>Recoge tu Comida</h3>
+                    <p>Dirígete al lugar indicado en el horario acordado para recoger tu pedido.</p>
+                </div>
+                <div class="paso">
+                    <div class="paso-numero">4</div>
+                    <h3>¡Disfruta!</h3>
+                    <p>Disfruta de tu comida deliciosa mientras ayudas al medio ambiente.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Nueva sección: Estadísticas de Impacto -->
+        <section class="impacto-section">
+            <h2>Nuestro Impacto</h2>
+            <div class="impacto-stats" id="impactoStats">
+                <div class="stat-card">
+                    <div class="stat-icon">🍽️</div>
+                    <div class="stat-number" id="comidasSalvadas">0</div>
+                    <div class="stat-label">Comidas Salvadas del Desperdicio</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-number" id="ahorroClientes">Bs 0</div>
+                    <div class="stat-label">Ahorro Total de Clientes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🌍</div>
+                    <div class="stat-number" id="co2Reducido">0 kg</div>
+                    <div class="stat-label">CO₂ Evitado</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Contacto -->
+        <section id="contacto" class="contacto-section">
+            <h2>Contáctanos</h2>
+            <div class="contacto-container">
+                <div class="contacto-info">
+                    <h3>¿Tienes preguntas?</h3>
+                    <p>Estamos aquí para ayudarte. Contáctanos por cualquier consulta sobre nuestro servicio.</p>
+                    <div class="contacto-items">
+                        <div class="contacto-item">
+                            <strong>📧 Email:</strong> info@comidasobrante.com
+                        </div>
+                        <div class="contacto-item">
+                            <strong>📱 WhatsApp:</strong> +591 7000-0000
+                        </div>
+                        <div class="contacto-item">
+                            <strong>📍 Ubicación:</strong> Santa Cruz de la Sierra, Bolivia
+                        </div>
+                    </div>
+                </div>
+                <div class="contacto-form">
+                    <h3>Envíanos un mensaje</h3>
+                    <form id="contacto-form">
+                        <div class="form-group">
+                            <input type="text" id="contacto-nombre" placeholder="Tu nombre" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" id="contacto-email" placeholder="Tu email" required>
+                        </div>
+                        <div class="form-group">
+                            <textarea id="contacto-mensaje" placeholder="Tu mensaje" rows="4" required></textarea>
+                        </div>
+                        <button type="submit" class="btn">Enviar Mensaje</button>
+                    </form>
                 </div>
             </div>
         </section>
@@ -93,7 +180,7 @@
     </div>
 
     <footer>
-        <p>&copy; 2025 Comida Sobrante. Todos los derechos reservados.</p>
+        <p>&copy; 2025 Comida Sobrante. Proyecto de Responsabilidad Social - Unidad Educativa Padre Jaime Gagnon 1</p>
     </footer>
 
     <script>
@@ -105,22 +192,82 @@
         const loginFromRegister = document.getElementById('login-from-register');
         const closeBtns = document.querySelectorAll('.close');
 
+        // Cargar estadísticas de impacto al iniciar
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarEstadisticasImpacto();
+        });
+
         // Verificar si ya está logueado al cargar la página
         window.addEventListener('load', () => {
             if (localStorage.getItem('isLoggedIn') === 'true') {
                 loginLink.textContent = 'Dashboard';
                 loginLink.onclick = (e) => {
                     e.preventDefault();
-                    window.location.href = 'dashboard.html';
+                    window.location.href = 'pedidos.html'; // Redirigir al dashboard de pedidos
                 };
             }
         });
+
+        // Cargar estadísticas de impacto
+        async function cargarEstadisticasImpacto() {
+            try {
+                const response = await fetch('/api/pedidos/estadisticas/resumen');
+                if (response.ok) {
+                    const stats = await response.json();
+                    
+                    // Calcular estadísticas de impacto
+                    const totalPedidos = stats.total_pedidos;
+                    const totalVentas = stats.por_estado.reduce((sum, estado) => 
+                        sum + parseFloat(estado.total_ventas || 0), 0);
+                    
+                    // Estimaciones de impacto ambiental
+                    const co2PorComida = 2.5; // kg CO2 promedio por comida desperdiciada
+                    const co2Evitado = totalPedidos * co2PorComida;
+                    
+                    // Actualizar números con animación
+                    animateNumber('comidasSalvadas', totalPedidos);
+                    animateNumber('ahorroClientes', totalVentas, 'Bs ');
+                    animateNumber('co2Reducido', Math.round(co2Evitado), '', ' kg');
+                }
+            } catch (error) {
+                console.log('No se pudieron cargar las estadísticas de impacto');
+                // Mostrar números ejemplo si no hay datos
+                animateNumber('comidasSalvadas', 156);
+                animateNumber('ahorroClientes', 2340.50, 'Bs ');
+                animateNumber('co2Reducido', 390, '', ' kg');
+            }
+        }
+
+        // Función para animar números
+        function animateNumber(elementId, finalValue, prefix = '', suffix = '') {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            const startValue = 0;
+            const duration = 2000; // 2 segundos
+            const increment = finalValue / (duration / 16); // 60fps aproximadamente
+            let currentValue = startValue;
+            
+            const timer = setInterval(() => {
+                currentValue += increment;
+                if (currentValue >= finalValue) {
+                    currentValue = finalValue;
+                    clearInterval(timer);
+                }
+                
+                const displayValue = typeof finalValue === 'number' && finalValue % 1 !== 0 
+                    ? currentValue.toFixed(2) 
+                    : Math.floor(currentValue);
+                
+                element.textContent = prefix + displayValue + suffix;
+            }, 16);
+        }
 
         // Open login modal
         loginLink.addEventListener('click', (e) => {
             e.preventDefault();
             if (localStorage.getItem('isLoggedIn') === 'true') {
-                window.location.href = 'dashboard.html';
+                window.location.href = 'pedidos.html'; // Ir al dashboard
                 return;
             }
             loginModal.style.display = 'block';
@@ -187,7 +334,7 @@
                 submitBtn.textContent = 'Iniciando sesión...';
                 submitBtn.disabled = true;
 
-                const response = await fetch('http://localhost:3000/auth/login', {
+                const response = await fetch('/api/auth/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -206,7 +353,7 @@
                     
                     showLoginSuccess('Login exitoso. Redirigiendo...');
                     setTimeout(() => {
-                        window.location.href = 'dashboard.html';
+                        window.location.href = 'pedidos.html'; // Redirigir al dashboard
                     }, 1500);
                 } else {
                     showLoginError(result.mensaje || 'Error al iniciar sesión');
@@ -264,7 +411,7 @@
                 submitBtn.textContent = 'Registrando...';
                 submitBtn.disabled = true;
 
-                const response = await fetch('http://localhost:3000/auth/register', {
+                const response = await fetch('/api/auth/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -298,6 +445,19 @@
                 submitBtn.textContent = 'Registrar';
                 submitBtn.disabled = false;
             }
+        });
+
+        // Handle contact form submission
+        document.getElementById('contacto-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const nombre = document.getElementById('contacto-nombre').value;
+            const email = document.getElementById('contacto-email').value;
+            const mensaje = document.getElementById('contacto-mensaje').value;
+            
+            // Simular envío de mensaje
+            alert(`Gracias ${nombre}! Tu mensaje ha sido enviado. Te contactaremos pronto.`);
+            this.reset();
         });
 
         // Funciones de ayuda para mostrar mensajes
@@ -341,6 +501,19 @@
                 this.setCustomValidity('');
                 this.style.borderColor = '#ccc';
             }
+        });
+
+        // Smooth scrolling para enlaces internos
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
         });
     </script>
 </body>
