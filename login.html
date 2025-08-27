@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Comida Sobrante</title>
+    <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="login-container">
+    <div class="login-form">
+        <h1>Iniciar Sesión</h1>
+        <form id="loginForm">
+            <label for="username">Nombre de usuario:</label>
+            <input type="text" id="username" name="username" required aria-describedby="username-help">
+            
+            <label for="password">Contraseña:</label>
+            <input type="password" id="password" name="password" required aria-describedby="password-help">
+            
+            <button type="submit">Iniciar sesión</button>
+            
+            <div id="error-message" class="alert" style="display: none;"></div>
+        </form>
+        
+        <p style="text-align: center; margin-top: 20px;">
+            ¿No tienes cuenta? <a href="register.html">Regístrate aquí</a>
+        </p>
+        
+        <p style="text-align: center; margin-top: 10px;">
+            <a href="index.html">Volver al inicio</a>
+        </p>
+    </div>
+
+    <script>
+        // Manejar el envío del formulario
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('error-message');
+
+            // Limpiar mensajes de error previos
+            errorMessage.style.display = 'none';
+
+            // Validaciones básicas
+            if (!username || !password) {
+                showError('Por favor, completa todos los campos.');
+                return;
+            }
+
+            try {
+                // Mostrar indicador de carga
+                const submitBtn = document.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = 'Iniciando sesión...';
+                submitBtn.disabled = true;
+
+                const response = await fetch('http://localhost:3000/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password }),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showSuccess('Login exitoso. Redirigiendo...');
+                    
+                    // Guardar información del usuario en localStorage
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('userId', result.usuario.id);
+                    localStorage.setItem('username', result.usuario.username);
+                    localStorage.setItem('loginTime', new Date().getTime());
+                    
+                    // Redirigir después de un breve delay
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1500);
+                } else {
+                    showError(result.mensaje || 'Error al iniciar sesión');
+                }
+
+                // Restaurar botón
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+
+            } catch (error) {
+                console.error('Error de conexión:', error);
+                showError('Error de conexión. Verifica tu conexión a internet e intenta de nuevo.');
+                
+                // Restaurar botón
+                const submitBtn = document.querySelector('button[type="submit"]');
+                submitBtn.textContent = 'Iniciar sesión';
+                submitBtn.disabled = false;
+            }
+        });
+
+        function showError(message) {
+            const errorMessage = document.getElementById('error-message');
+            errorMessage.textContent = message;
+            errorMessage.className = 'alert';
+            errorMessage.style.display = 'block';
+        }
+
+        function showSuccess(message) {
+            const errorMessage = document.getElementById('error-message');
+            errorMessage.textContent = message;
+            errorMessage.className = 'alert success';
+            errorMessage.style.display = 'block';
+        }
+
+        // Enfocar el primer campo al cargar la página
+        window.addEventListener('load', () => {
+            document.getElementById('username').focus();
+        });
+
+        // Verificar si ya está logueado
+        if (localStorage.getItem('isLoggedIn') === 'true') {
+            window.location.href = 'dashboard.html';
+        }
+    </script>
+</body>
+</html>

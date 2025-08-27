@@ -14,76 +14,334 @@
         </div>
         <nav>
             <ul>
-                <li><a href="#">Inicio</a></li>
-                <li><a href="#">Productos</a></li>
-                <li><a href="#">Cómo Funciona</a></li>
-                <li><a href="#">Contáctanos</a></li>
-                <li><a href="login/login.html" id="login-link">Iniciar Sesión</a></li>
+                <li><a href="#" aria-label="Ir a inicio">Inicio</a></li>
+                <li><a href="#" aria-label="Ver productos">Productos</a></li>
+                <li><a href="#" aria-label="Cómo funciona">Cómo Funciona</a></li>
+                <li><a href="#" aria-label="Contacto">Contáctanos</a></li>
+                <li><a href="#" id="login-link" aria-label="Iniciar sesión">Iniciar Sesión</a></li>
             </ul>
         </nav>
     </header>
 
-    <section class="hero">
-        <h2>¡Disfruta comida deliciosa y económica!</h2>
-        <p>Reduce el desperdicio y ahorra comprando comida en buen estado a precios más bajos.</p>
-        <a href="#" class="btn">Ver productos</a>
-    </section>
+    <main>
+        <section class="hero">
+            <h2>¡Disfruta comida deliciosa y económica!</h2>
+            <p>Reduce el desperdicio y ahorra comprando comida en buen estado a precios más bajos.</p>
+            <a href="#" class="btn" aria-label="Ver productos disponibles">Ver productos</a>
+        </section>
+
+        <section class="benefits">
+            <h2>¿Por qué elegirnos?</h2>
+            <div class="benefits-container">
+                <div class="benefit">
+                    <h3>Ahorra dinero</h3>
+                    <p>Comida deliciosa a precios accesibles, perfecta para tu bolsillo.</p>
+                </div>
+                <div class="benefit">
+                    <h3>Ayuda al medio ambiente</h3>
+                    <p>Contribuye a reducir el desperdicio de alimentos.</p>
+                </div>
+                <div class="benefit">
+                    <h3>Apoya la economía circular</h3>
+                    <p>Compra alimentos de calidad, ayudando a los negocios locales.</p>
+                </div>
+            </div>
+        </section>
+    </main>
 
     <!-- Login Modal -->
-    <div id="login-modal" class="modal">
+    <div id="login-modal" class="modal" role="dialog" aria-labelledby="login-title" aria-hidden="true">
         <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Iniciar Sesión</h2>
+            <span class="close" aria-label="Cerrar modal">&times;</span>
+            <h2 id="login-title">Iniciar Sesión</h2>
             <form id="login-form">
                 <label for="username">Nombre de Usuario</label>
-                <input type="text" id="username" name="username" required>
+                <input type="text" id="username" name="username" required aria-describedby="username-error">
 
                 <label for="password">Contraseña</label>
-                <input type="password" id="password" name="password" required>
+                <input type="password" id="password" name="password" required aria-describedby="password-error">
 
                 <button type="submit" class="btn">Iniciar sesión</button>
+                
+                <div id="login-error" class="alert" style="display: none;"></div>
             </form>
             <p>¿No tienes cuenta? <a href="#" id="register-link">Regístrate aquí</a></p>
         </div>
     </div>
 
     <!-- Register Modal -->
-    <div id="register-modal" class="modal">
+    <div id="register-modal" class="modal" role="dialog" aria-labelledby="register-title" aria-hidden="true">
         <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Registrar Nueva Cuenta</h2>
+            <span class="close" aria-label="Cerrar modal">&times;</span>
+            <h2 id="register-title">Registrar Nueva Cuenta</h2>
             <form id="register-form">
                 <label for="new-username">Nombre de Usuario</label>
-                <input type="text" id="new-username" name="username" required>
+                <input type="text" id="new-username" name="username" required minlength="3">
 
                 <label for="new-password">Contraseña</label>
-                <input type="password" id="new-password" name="password" required>
+                <input type="password" id="new-password" name="password" required minlength="6">
+
+                <label for="confirm-password">Confirmar Contraseña</label>
+                <input type="password" id="confirm-password" name="confirmPassword" required>
 
                 <button type="submit" class="btn">Registrar</button>
+                
+                <div id="register-error" class="alert" style="display: none;"></div>
             </form>
+            <p>¿Ya tienes cuenta? <a href="#" id="login-from-register">Inicia sesión aquí</a></p>
         </div>
     </div>
-
-    <section class="benefits">
-        <h2>¿Por qué elegirnos?</h2>
-        <div class="benefit">
-            <h3>Ahorra dinero</h3>
-            <p>Comida deliciosa a precios accesibles, perfecta para tu bolsillo.</p>
-        </div>
-        <div class="benefit">
-            <h3>Ayuda al medio ambiente</h3>
-            <p>Contribuye a reducir el desperdicio de alimentos.</p>
-        </div>
-        <div class="benefit">
-            <h3>Apoya la economía circular</h3>
-            <p>Compra alimentos de calidad, ayudando a los negocios locales.</p>
-        </div>
-    </section>
 
     <footer>
         <p>&copy; 2025 Comida Sobrante. Todos los derechos reservados.</p>
     </footer>
 
-    <script src="login.js"></script>
+    <script>
+        // Modal functionality
+        const loginModal = document.getElementById('login-modal');
+        const registerModal = document.getElementById('register-modal');
+        const loginLink = document.getElementById('login-link');
+        const registerLink = document.getElementById('register-link');
+        const loginFromRegister = document.getElementById('login-from-register');
+        const closeBtns = document.querySelectorAll('.close');
+
+        // Verificar si ya está logueado al cargar la página
+        window.addEventListener('load', () => {
+            if (localStorage.getItem('isLoggedIn') === 'true') {
+                loginLink.textContent = 'Dashboard';
+                loginLink.onclick = (e) => {
+                    e.preventDefault();
+                    window.location.href = 'dashboard.html';
+                };
+            }
+        });
+
+        // Open login modal
+        loginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (localStorage.getItem('isLoggedIn') === 'true') {
+                window.location.href = 'dashboard.html';
+                return;
+            }
+            loginModal.style.display = 'block';
+            loginModal.setAttribute('aria-hidden', 'false');
+        });
+
+        // Switch to register modal
+        registerLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginModal.style.display = 'none';
+            registerModal.style.display = 'block';
+            loginModal.setAttribute('aria-hidden', 'true');
+            registerModal.setAttribute('aria-hidden', 'false');
+        });
+
+        // Switch back to login modal
+        loginFromRegister.addEventListener('click', (e) => {
+            e.preventDefault();
+            registerModal.style.display = 'none';
+            loginModal.style.display = 'block';
+            registerModal.setAttribute('aria-hidden', 'true');
+            loginModal.setAttribute('aria-hidden', 'false');
+        });
+
+        // Close modals
+        closeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                loginModal.style.display = 'none';
+                registerModal.style.display = 'none';
+                loginModal.setAttribute('aria-hidden', 'true');
+                registerModal.setAttribute('aria-hidden', 'true');
+            });
+        });
+
+        // Close modals when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === loginModal || e.target === registerModal) {
+                loginModal.style.display = 'none';
+                registerModal.style.display = 'none';
+                loginModal.setAttribute('aria-hidden', 'true');
+                registerModal.setAttribute('aria-hidden', 'true');
+            }
+        });
+
+        // Handle login form submission
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('login-error');
+            
+            // Limpiar errores previos
+            errorDiv.style.display = 'none';
+
+            if (!username || !password) {
+                showLoginError('Por favor, completa todos los campos.');
+                return;
+            }
+
+            try {
+                const submitBtn = document.querySelector('#login-form button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = 'Iniciando sesión...';
+                submitBtn.disabled = true;
+
+                const response = await fetch('http://localhost:3000/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password }),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Guardar información del usuario
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('userId', result.usuario.id);
+                    localStorage.setItem('username', result.usuario.username);
+                    localStorage.setItem('loginTime', new Date().getTime());
+                    
+                    showLoginSuccess('Login exitoso. Redirigiendo...');
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1500);
+                } else {
+                    showLoginError(result.mensaje || 'Error al iniciar sesión');
+                }
+
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+
+            } catch (error) {
+                console.error('Error de conexión:', error);
+                showLoginError('Error de conexión. Intenta de nuevo.');
+                
+                const submitBtn = document.querySelector('#login-form button[type="submit"]');
+                submitBtn.textContent = 'Iniciar sesión';
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Handle register form submission
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('new-username').value.trim();
+            const password = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const errorDiv = document.getElementById('register-error');
+            
+            // Limpiar errores previos
+            errorDiv.style.display = 'none';
+
+            // Validaciones
+            if (!username || !password || !confirmPassword) {
+                showRegisterError('Por favor, completa todos los campos.');
+                return;
+            }
+
+            if (username.length < 3) {
+                showRegisterError('El nombre de usuario debe tener al menos 3 caracteres.');
+                return;
+            }
+
+            if (password.length < 6) {
+                showRegisterError('La contraseña debe tener al menos 6 caracteres.');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showRegisterError('Las contraseñas no coinciden.');
+                return;
+            }
+
+            try {
+                const submitBtn = document.querySelector('#register-form button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = 'Registrando...';
+                submitBtn.disabled = true;
+
+                const response = await fetch('http://localhost:3000/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password }),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showRegisterSuccess('Usuario registrado con éxito. Cambiando al login...');
+                    document.getElementById('register-form').reset();
+                    setTimeout(() => {
+                        registerModal.style.display = 'none';
+                        loginModal.style.display = 'block';
+                        registerModal.setAttribute('aria-hidden', 'true');
+                        loginModal.setAttribute('aria-hidden', 'false');
+                    }, 2000);
+                } else {
+                    showRegisterError(result.mensaje || 'Error al registrar usuario');
+                }
+
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+
+            } catch (error) {
+                console.error('Error de conexión:', error);
+                showRegisterError('Error de conexión. Intenta de nuevo.');
+                
+                const submitBtn = document.querySelector('#register-form button[type="submit"]');
+                submitBtn.textContent = 'Registrar';
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Funciones de ayuda para mostrar mensajes
+        function showLoginError(message) {
+            const errorDiv = document.getElementById('login-error');
+            errorDiv.textContent = message;
+            errorDiv.className = 'alert';
+            errorDiv.style.display = 'block';
+        }
+
+        function showLoginSuccess(message) {
+            const errorDiv = document.getElementById('login-error');
+            errorDiv.textContent = message;
+            errorDiv.className = 'alert success';
+            errorDiv.style.display = 'block';
+        }
+
+        function showRegisterError(message) {
+            const errorDiv = document.getElementById('register-error');
+            errorDiv.textContent = message;
+            errorDiv.className = 'alert';
+            errorDiv.style.display = 'block';
+        }
+
+        function showRegisterSuccess(message) {
+            const errorDiv = document.getElementById('register-error');
+            errorDiv.textContent = message;
+            errorDiv.className = 'alert success';
+            errorDiv.style.display = 'block';
+        }
+
+        // Validación en tiempo real de confirmación de contraseña
+        document.getElementById('confirm-password').addEventListener('input', function() {
+            const password = document.getElementById('new-password').value;
+            const confirmPassword = this.value;
+            
+            if (confirmPassword && password !== confirmPassword) {
+                this.setCustomValidity('Las contraseñas no coinciden');
+                this.style.borderColor = '#d32f2f';
+            } else {
+                this.setCustomValidity('');
+                this.style.borderColor = '#ccc';
+            }
+        });
+    </script>
 </body>
 </html>

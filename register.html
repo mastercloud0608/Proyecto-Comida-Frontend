@@ -1,47 +1,298 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registro</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Comida Sobrante</title>
+    <link rel="stylesheet" href="assets/styles.css">
 </head>
-<body>
-  <h1>Registro</h1>
-  <form id="registerForm">
-    <label for="username">Nombre de usuario:</label>
-    <input type="text" id="username" name="username" required>
-    <br><br>
-    <label for="password">Contraseña:</label>
-    <input type="password" id="password" name="password" required>
-    <br><br>
-    <button type="submit">Registrar</button>
-  </form>
+<body class="login-container">
+    <div class="login-form">
+        <h1>Crear Cuenta</h1>
+        <form id="registerForm" novalidate>
+            <label for="username">Nombre de usuario:</label>
+            <input 
+                type="text" 
+                id="username" 
+                name="username" 
+                required 
+                minlength="3"
+                maxlength="50"
+                pattern="^[a-zA-Z0-9@._-]+$"
+                aria-describedby="username-help"
+                autocomplete="username">
+            <small id="username-help" style="color: #666; font-size: 0.9em;">
+                Mínimo 3 caracteres. Puedes usar letras, números, @, ., _ y -
+            </small>
+            
+            <label for="password">Contraseña:</label>
+            <input 
+                type="password" 
+                id="password" 
+                name="password" 
+                required 
+                minlength="6"
+                aria-describedby="password-help"
+                autocomplete="new-password">
+            <small id="password-help" style="color: #666; font-size: 0.9em;">
+                Mínimo 6 caracteres
+            </small>
+            
+            <label for="confirmPassword">Confirmar contraseña:</label>
+            <input 
+                type="password" 
+                id="confirmPassword" 
+                name="confirmPassword" 
+                required
+                aria-describedby="confirm-help"
+                autocomplete="new-password">
+            <small id="confirm-help" style="color: #666; font-size: 0.9em;">
+                Repite la contraseña anterior
+            </small>
+            
+            <button type="submit" id="submitBtn">Crear cuenta</button>
+            
+            <div id="error-message" class="alert" style="display: none;"></div>
+        </form>
+        
+        <p style="text-align: center; margin-top: 20px;">
+            ¿Ya tienes cuenta? <a href="login.html">Inicia sesión aquí</a>
+        </p>
+        
+        <p style="text-align: center; margin-top: 10px;">
+            <a href="index.html">Volver al inicio</a>
+        </p>
+    </div>
 
-  <script>
-    // Manejar el envío del formulario
-    document.getElementById('registerForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
+    <script>
+        // Variables globales
+        const form = document.getElementById('registerForm');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const submitBtn = document.getElementById('submitBtn');
+        const errorMessage = document.getElementById('error-message');
 
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
+        // Verificar si ya está logueado al cargar la página
+        window.addEventListener('load', () => {
+            // Si ya hay una sesión activa, redirigir al dashboard
+            if (localStorage.getItem('isLoggedIn') === 'true') {
+                window.location.href = 'dashboard.html';
+                return;
+            }
+            usernameInput.focus();
+        });
 
-      const response = await fetch('/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      });
+        // Manejar el envío del formulario
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-      const result = await response.json();
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
 
-      if (response.ok) {
-        alert('Usuario registrado con éxito');
-        window.location.href = '/success.html'; // Redirigir a página de éxito
-      } else {
-        alert(result.mensaje || 'Error al registrar usuario');
-      }
-    });
-  </script>
+            // Limpiar mensajes de error previos
+            hideError();
+
+            // Validaciones del lado cliente
+            if (!validateForm(username, password, confirmPassword)) {
+                return;
+            }
+
+            try {
+                // Mostrar indicador de carga
+                setLoadingState(true);
+
+                const response = await fetch('http://localhost:3000/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password }),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showSuccess('¡Usuario registrado con éxito! Redirigiendo al login...');
+                    
+                    // Limpiar formulario
+                    form.reset();
+                    
+                    // Redirigir después de un breve delay
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                } else {
+                    // Manejar diferentes tipos de errores del servidor
+                    handleServerError(response.status, result.mensaje);
+                }
+
+            } catch (error) {
+                console.error('Error de conexión:', error);
+                showError('Error de conexión. Verifica tu conexión a internet e intenta de nuevo.');
+            } finally {
+                // Restaurar botón siempre
+                setLoadingState(false);
+            }
+        });
+
+        // Validaciones del formulario
+        function validateForm(username, password, confirmPassword) {
+            // Verificar campos vacíos
+            if (!username || !password || !confirmPassword) {
+                showError('Por favor, completa todos los campos.');
+                return false;
+            }
+
+            // Validar longitud del username
+            if (username.length < 3) {
+                showError('El nombre de usuario debe tener al menos 3 caracteres.');
+                usernameInput.focus();
+                return false;
+            }
+
+            if (username.length > 50) {
+                showError('El nombre de usuario no puede tener más de 50 caracteres.');
+                usernameInput.focus();
+                return false;
+            }
+
+            // Validar formato del username
+            const usernameRegex = /^[a-zA-Z0-9@._-]+$/;
+            if (!usernameRegex.test(username)) {
+                showError('El nombre de usuario solo puede contener letras, números y los caracteres @ . _ -');
+                usernameInput.focus();
+                return false;
+            }
+
+            // Validar contraseña
+            if (password.length < 6) {
+                showError('La contraseña debe tener al menos 6 caracteres.');
+                passwordInput.focus();
+                return false;
+            }
+
+            // Verificar que las contraseñas coincidan
+            if (password !== confirmPassword) {
+                showError('Las contraseñas no coinciden.');
+                confirmPasswordInput.focus();
+                return false;
+            }
+
+            return true;
+        }
+
+        // Manejar errores del servidor
+        function handleServerError(status, message) {
+            switch (status) {
+                case 400:
+                    if (message.includes('ya está registrado')) {
+                        showError('Este nombre de usuario ya está en uso. Elige otro.');
+                        usernameInput.focus();
+                    } else {
+                        showError(message || 'Datos inválidos. Verifica la información.');
+                    }
+                    break;
+                case 500:
+                    showError('Error interno del servidor. Intenta más tarde.');
+                    break;
+                default:
+                    showError(message || 'Error inesperado. Intenta de nuevo.');
+            }
+        }
+
+        // Validación en tiempo real de confirmación de contraseña
+        confirmPasswordInput.addEventListener('input', function() {
+            const password = passwordInput.value;
+            const confirmPassword = this.value;
+            
+            if (confirmPassword && password !== confirmPassword) {
+                this.setCustomValidity('Las contraseñas no coinciden');
+                this.style.borderColor = '#d32f2f';
+            } else {
+                this.setCustomValidity('');
+                this.style.borderColor = '#ccc';
+            }
+        });
+
+        // Validación en tiempo real del username
+        usernameInput.addEventListener('input', function() {
+            const username = this.value.trim();
+            const usernameRegex = /^[a-zA-Z0-9@._-]*$/;
+            
+            if (username && !usernameRegex.test(username)) {
+                this.setCustomValidity('Solo se permiten letras, números y @ . _ -');
+                this.style.borderColor = '#d32f2f';
+            } else {
+                this.setCustomValidity('');
+                this.style.borderColor = '#ccc';
+            }
+        });
+
+        // Funciones de utilidad
+        function setLoadingState(isLoading) {
+            if (isLoading) {
+                submitBtn.textContent = 'Creando cuenta...';
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.7';
+            } else {
+                submitBtn.textContent = 'Crear cuenta';
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+            }
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.className = 'alert';
+            errorMessage.style.display = 'block';
+            
+            // Auto-hide después de 5 segundos
+            setTimeout(() => {
+                if (errorMessage.className === 'alert') {
+                    hideError();
+                }
+            }, 5000);
+        }
+
+        function showSuccess(message) {
+            errorMessage.textContent = message;
+            errorMessage.className = 'alert success';
+            errorMessage.style.display = 'block';
+        }
+
+        function hideError() {
+            errorMessage.style.display = 'none';
+        }
+
+        // Prevenir envío del formulario al presionar Enter en campos que no sean el botón
+        form.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
+                e.preventDefault();
+                
+                // Si estamos en el último campo, enviar formulario
+                if (e.target === confirmPasswordInput) {
+                    form.dispatchEvent(new Event('submit'));
+                } else {
+                    // Mover al siguiente campo
+                    const inputs = Array.from(form.querySelectorAll('input'));
+                    const currentIndex = inputs.indexOf(e.target);
+                    if (currentIndex < inputs.length - 1) {
+                        inputs[currentIndex + 1].focus();
+                    }
+                }
+            }
+        });
+
+        // Limpiar estilos de error cuando el usuario comience a escribir
+        [usernameInput, passwordInput, confirmPasswordInput].forEach(input => {
+            input.addEventListener('input', () => {
+                if (input.style.borderColor === 'rgb(211, 47, 47)') {
+                    input.style.borderColor = '#ccc';
+                }
+            });
+        });
+    </script>
 </body>
 </html>

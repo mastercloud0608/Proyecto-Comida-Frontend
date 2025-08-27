@@ -13,6 +13,7 @@ body {
     line-height: 1.6;
 }
 
+/* Header */
 header {
     background-color: #4CAF50;
     padding: 20px;
@@ -20,14 +21,19 @@ header {
     text-align: center;
 }
 
-header h1 {
-    margin-bottom: 10px;
+header .logo h1 {
+    margin-bottom: 5px;
     font-size: 2.5rem;
+}
+
+header .logo p {
+    font-size: 1rem;
+    opacity: 0.9;
 }
 
 header nav ul {
     list-style: none;
-    margin-top: 10px;
+    margin-top: 15px;
 }
 
 header nav ul li {
@@ -39,6 +45,11 @@ header nav ul li a {
     color: white;
     text-decoration: none;
     font-size: 1rem;
+    transition: opacity 0.3s;
+}
+
+header nav ul li a:hover {
+    opacity: 0.8;
 }
 
 /* Hero section */
@@ -51,19 +62,23 @@ header nav ul li a {
 .hero h2 {
     font-size: 2.5rem;
     margin-bottom: 10px;
+    color: #2e7d32;
 }
 
 .hero p {
     font-size: 1.2rem;
     margin-bottom: 20px;
+    color: #555;
 }
 
 .hero .btn {
-    padding: 10px 20px;
+    padding: 12px 24px;
     background-color: #4CAF50;
     color: white;
     text-decoration: none;
     border-radius: 5px;
+    display: inline-block;
+    transition: background-color 0.3s;
 }
 
 .hero .btn:hover {
@@ -72,24 +87,42 @@ header nav ul li a {
 
 /* Benefits section */
 .benefits {
-    display: flex;
-    justify-content: space-around;
     padding: 50px 20px;
     text-align: center;
     background-color: #ffffff;
 }
 
+.benefits h2 {
+    font-size: 2.2rem;
+    margin-bottom: 40px;
+    color: #2e7d32;
+}
+
+.benefits-container {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
 .benefit {
-    width: 30%;
+    flex: 1;
+    min-width: 280px;
+    max-width: 350px;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .benefit h3 {
     font-size: 1.8rem;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
+    color: #4CAF50;
 }
 
 .benefit p {
     font-size: 1rem;
+    color: #666;
 }
 
 /* Footer */
@@ -98,32 +131,37 @@ footer {
     color: white;
     text-align: center;
     padding: 20px 0;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
+    margin-top: 50px;
 }
 
 /* Modal styles */
 .modal {
-    display: none; 
-    position: fixed; 
-    z-index: 1; 
+    display: none;
+    position: fixed;
+    z-index: 1000;
     left: 0;
     top: 0;
-    width: 100%; 
-    height: 100%; 
+    width: 100%;
+    height: 100%;
     overflow: auto;
-    background-color: rgb(0,0,0); 
-    background-color: rgba(0,0,0,0.4);
-    padding-top: 60px;
+    background-color: rgba(0, 0, 0, 0.4);
 }
 
 .modal-content {
     background-color: #fefefe;
-    margin: 5% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
+    margin: 10% auto;
+    padding: 30px;
+    border: none;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #333;
 }
 
 .close {
@@ -131,15 +169,16 @@ footer {
     float: right;
     font-size: 28px;
     font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s;
 }
 
 .close:hover,
 .close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
+    color: #333;
 }
 
+/* Form styles */
 form {
     display: flex;
     flex-direction: column;
@@ -148,12 +187,23 @@ form {
 
 label {
     font-size: 1.1rem;
+    color: #555;
+    font-weight: 500;
 }
 
-input {
-    padding: 10px;
+input[type="text"],
+input[type="password"] {
+    padding: 12px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+    outline: none;
+    border-color: #4CAF50;
 }
 
 button {
@@ -163,122 +213,84 @@ button {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
 }
 
 button:hover {
     background-color: #45a049;
 }
 
+/* Links */
 a {
     color: #4CAF50;
     text-decoration: none;
+    transition: color 0.3s;
 }
 
 a:hover {
+    color: #45a049;
     text-decoration: underline;
 }
 
-/* Reseteo de márgenes y paddings */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* Login page specific styles */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f4f4f4;
 }
 
-/* Estilos generales */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
-    color: #333;
-    line-height: 1.6;
+.login-form {
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
 }
 
-header {
-    background-color: #4CAF50;
-    padding: 20px;
-    color: white;
+.login-form h1 {
     text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+    font-size: 2rem;
 }
 
-header h1 {
-    margin-bottom: 10px;
-    font-size: 2.5rem;
-}
-
-header nav ul {
-    list-style: none;
+/* Alert messages */
+.alert {
+    color: #d32f2f;
+    text-align: center;
+    font-size: 14px;
     margin-top: 10px;
 }
 
-header nav ul li {
-    display: inline;
-    margin: 0 15px;
+.alert.success {
+    color: #2e7d32;
 }
 
-header nav ul li a {
-    color: white;
-    text-decoration: none;
-    font-size: 1rem;
-}
-
-/* Hero section */
-.hero {
-    background-color: #e8f5e9;
-    text-align: center;
-    padding: 50px 20px;
-}
-
-.hero h2 {
-    font-size: 2.5rem;
-    margin-bottom: 10px;
-}
-
-.hero p {
-    font-size: 1.2rem;
-    margin-bottom: 20px;
-}
-
-.hero .btn {
-    padding: 10px 20px;
-    background-color: #4CAF50;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-}
-
-.hero .btn:hover {
-    background-color: #45a049;
-}
-
-/* Benefits section */
-.benefits {
-    display: flex;
-    justify-content: space-around;
-    padding: 50px 20px;
-    text-align: center;
-    background-color: #ffffff;
-}
-
-.benefit {
-    width: 30%;
-}
-
-.benefit h3 {
-    font-size: 1.8rem;
-    margin-bottom: 10px;
-}
-
-.benefit p {
-    font-size: 1rem;
-}
-
-/* Footer */
-footer {
-    background-color: #4CAF50;
-    color: white;
-    text-align: center;
-    padding: 20px 0;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
+/* Responsive design */
+@media (max-width: 768px) {
+    header .logo h1 {
+        font-size: 2rem;
+    }
+    
+    .hero h2 {
+        font-size: 2rem;
+    }
+    
+    .hero p {
+        font-size: 1.1rem;
+    }
+    
+    .benefits-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    header nav ul li {
+        display: block;
+        margin: 5px 0;
+    }
 }
