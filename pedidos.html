@@ -200,9 +200,17 @@
     </footer>
 
     <script>
+        // === BASE API (prod/local) ===
+        const API_BASE = location.hostname.endsWith('netlify.app')
+          ? 'https://proyecto-comida-backend.onrender.com' // <-- tu backend público
+          : 'http://localhost:3000';
+
         let pedidos = [];
         let comidas = [];
         let editandoPedidoId = null;
+
+        // Helpers para normalizar respuestas {items, meta} o []
+        const asArray = (data) => Array.isArray(data) ? data : (data?.items || []);
 
         // Cargar datos al iniciar
         document.addEventListener('DOMContentLoaded', function() {
@@ -215,20 +223,32 @@
             const comidaId = urlParams.get('comida');
             if (comidaId) {
                 mostrarFormularioNuevoPedido();
-                document.getElementById('comidaSelect').value = comidaId;
-                calcularPrecioTotal();
+                // se seleccionará cuando carguen las comidas
+                const checkAndSelect = setInterval(() => {
+                  const sel = document.getElementById('comidaSelect');
+                  if (sel.options.length > 1) {
+                    sel.value = comidaId;
+                    calcularPrecioTotal();
+                    clearInterval(checkAndSelect);
+                  }
+                }, 200);
+                setTimeout(() => clearInterval(checkAndSelect), 3000);
             }
         });
 
         // Cargar todas las comidas para el selector
         async function cargarComidas() {
             try {
-                const response = await fetch('/api/comidas');
+                const response = await fetch(`${API_BASE}/api/comidas`);
                 if (!response.ok) throw new Error('Error al cargar comidas');
                 
-                comidas = await response.json();
+                const data = await response.json();
+                comidas = asArray(data);
+
                 const select = document.getElementById('comidaSelect');
-                
+                // limpiar, dejar placeholder
+                select.innerHTML = '<option value="">Selecciona una comida...</option>';
+
                 comidas.forEach(comida => {
                     const option = document.createElement('option');
                     option.value = comida.id;
@@ -236,6 +256,8 @@
                     option.dataset.precio = comida.precio;
                     select.appendChild(option);
                 });
+
+                calcularPrecioTotal();
             } catch (error) {
                 console.error('Error:', error);
                 mostrarMensaje('Error al cargar las comidas', 'error');
@@ -246,10 +268,11 @@
         async function cargarPedidos() {
             try {
                 mostrarLoading(true);
-                const response = await fetch('/api/pedidos');
+                const response = await fetch(`${API_BASE}/api/pedidos`);
                 if (!response.ok) throw new Error('Error al cargar pedidos');
                 
-                pedidos = await response.json();
+                const data = await response.json();
+                pedidos = asArray(data);
                 mostrarPedidos(pedidos);
             } catch (error) {
                 console.error('Error:', error);
@@ -262,13 +285,14 @@
         // Cargar estadísticas
         async function cargarEstadisticas() {
             try {
-                const response = await fetch('/api/pedidos/estadisticas/resumen');
+                const response = await fetch(`${API_BASE}/api/pedidos/estadisticas/resumen`);
                 if (!response.ok) throw new Error('Error al cargar estadísticas');
                 
                 const stats = await response.json();
-                document.getElementById('totalPedidos').textContent = stats.total_pedidos;
-                document.getElementById('pedidosHoy').textContent = stats.estadisticas_hoy.pedidos_hoy;
-                document.getElementById('ventasHoy').textContent = `Bs ${parseFloat(stats.estadisticas_hoy.ventas_hoy).toFixed(2)}`;
+                document.getElementById('totalPedidos').textContent = stats.total_pedidos ?? 0;
+                document.getElementById('pedidosHoy').textContent = stats.estadisticas_hoy?.pedidos_hoy ?? 0;
+                const ventas = parseFloat(stats.estadisticas_hoy?.ventas_hoy ?? 0);
+                document.getElementById('ventasHoy').textContent = `Bs ${ventas.toFixed(2)}`;
             } catch (error) {
                 console.error('Error al cargar estadísticas:', error);
             }
@@ -278,7 +302,7 @@
         function mostrarPedidos(pedidosArray) {
             const container = document.getElementById('pedidosContainer');
             
-            if (pedidosArray.length === 0) {
+            if (!pedidosArray.length) {
                 container.innerHTML = '<div class="no-results">No hay pedidos disponibles</div>';
                 return;
             }
@@ -287,17 +311,17 @@
                 <div class="pedido-card">
                     <div class="pedido-header">
                         <div class="pedido-id">Pedido #${pedido.id}</div>
-                        <span class="estado-badge ${pedido.estado}">${pedido.estado.replace('-', ' ')}</span>
+                        <span class="estado-badge ${pedido.estado}">${(pedido.estado || '').replace('-', ' ')}</span>
                     </div>
                     <div class="pedido-info">
                         <p><strong>Cliente:</strong> ${pedido.nombre_cliente}</p>
                         <p><strong>Email:</strong> ${pedido.email_cliente}</p>
                         <p><strong>Teléfono:</strong> ${pedido.telefono_cliente || 'No proporcionado'}</p>
-                        <p><strong>Comida:</strong> ${pedido.nombre_comida}</p>
-                        <p><strong>Categoría:</strong> ${pedido.categoria_comida}</p>
+                        <p><strong>Comida:</strong> ${pedido.nombre_comida ?? ''}</p>
+                        <p><strong>Categoría:</strong> ${pedido.categoria_comida ?? ''}</p>
                         <p><strong>Cantidad:</strong> ${pedido.cantidad}</p>
-                        <p><strong>Total:</strong> Bs ${parseFloat(pedido.precio_total).toFixed(2)}</p>
-                        <p><strong>Fecha:</strong> ${new Date(pedido.fecha_pedido).toLocaleString()}</p>
+                        <p><strong>Total:</strong> Bs ${parseFloat(pedido.precio_total ?? 0).toFixed(2)}</p>
+                        <p><strong>Fecha:</strong> ${pedido.fecha_pedido ? new Date(pedido.fecha_pedido).toLocaleString() : ''}</p>
                         ${pedido.notas ? `<p><strong>Notas:</strong> ${pedido.notas}</p>` : ''}
                     </div>
                     <div class="pedido-actions">
@@ -331,28 +355,24 @@
             let pedidosFiltrados = pedidos;
 
             if (filtroEstado) {
-                pedidosFiltrados = pedidosFiltrados.filter(pedido => 
-                    pedido.estado === filtroEstado
-                );
+                pedidosFiltrados = pedidosFiltrados.filter(pedido => pedido.estado === filtroEstado);
             }
 
             if (filtroCliente) {
                 pedidosFiltrados = pedidosFiltrados.filter(pedido => 
-                    pedido.nombre_cliente.toLowerCase().includes(filtroCliente) ||
-                    pedido.email_cliente.toLowerCase().includes(filtroCliente)
+                    (pedido.nombre_cliente || '').toLowerCase().includes(filtroCliente) ||
+                    (pedido.email_cliente || '').toLowerCase().includes(filtroCliente)
                 );
             }
 
             mostrarPedidos(pedidosFiltrados);
         }
 
-        // Mostrar formulario para nuevo pedido
+        // Mostrar/Ocultar formulario
         function mostrarFormularioNuevoPedido() {
             document.getElementById('nuevoPedidoSection').style.display = 'block';
             document.getElementById('nuevoPedidoSection').scrollIntoView({ behavior: 'smooth' });
         }
-
-        // Ocultar formulario para nuevo pedido
         function ocultarFormularioNuevoPedido() {
             document.getElementById('nuevoPedidoSection').style.display = 'none';
             document.getElementById('formNuevoPedido').reset();
@@ -367,7 +387,7 @@
             
             if (selectedOption && selectedOption.dataset.precio) {
                 const precioUnitario = parseFloat(selectedOption.dataset.precio);
-                const total = precioUnitario * cantidad;
+                const total = (isNaN(precioUnitario) ? 0 : precioUnitario) * cantidad;
                 document.getElementById('precioTotal').textContent = total.toFixed(2);
             } else {
                 document.getElementById('precioTotal').textContent = '0.00';
@@ -378,7 +398,7 @@
         document.getElementById('comidaSelect').addEventListener('change', calcularPrecioTotal);
         document.getElementById('cantidad').addEventListener('input', calcularPrecioTotal);
 
-        // Manejar envío del formulario de nuevo pedido
+        // Crear pedido
         document.getElementById('formNuevoPedido').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -386,14 +406,14 @@
             const pedidoData = Object.fromEntries(formData.entries());
 
             try {
-                const response = await fetch('/api/pedidos', {
+                const response = await fetch(`${API_BASE}/api/pedidos`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(pedidoData)
                 });
 
                 if (!response.ok) {
-                    const errorData = await response.json();
+                    const errorData = await response.json().catch(() => ({}));
                     throw new Error(errorData.mensaje || 'Error al crear pedido');
                 }
 
@@ -407,19 +427,18 @@
             }
         });
 
-        // Función para editar pedido
+        // Editar pedido (abrir modal)
         function editarPedido(id) {
             const pedido = pedidos.find(p => p.id === id);
             if (!pedido) return;
 
-            // Llenar el formulario de edición
             document.getElementById('editPedidoId').value = pedido.id;
-            document.getElementById('editNombreCliente').value = pedido.nombre_cliente;
-            document.getElementById('editEmailCliente').value = pedido.email_cliente;
+            document.getElementById('editNombreCliente').value = pedido.nombre_cliente || '';
+            document.getElementById('editEmailCliente').value = pedido.email_cliente || '';
             document.getElementById('editTelefonoCliente').value = pedido.telefono_cliente || '';
             document.getElementById('editDireccion').value = pedido.direccion || '';
-            document.getElementById('editCantidad').value = pedido.cantidad;
-            document.getElementById('editEstado').value = pedido.estado;
+            document.getElementById('editCantidad').value = pedido.cantidad || 1;
+            document.getElementById('editEstado').value = pedido.estado || 'pendiente';
             document.getElementById('editNotas').value = pedido.notas || '';
 
             editandoPedidoId = id;
@@ -433,24 +452,23 @@
             editandoPedidoId = null;
         }
 
-        // Manejar envío del formulario de edición
+        // Guardar edición
         document.getElementById('formEditarPedido').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
             if (!editandoPedidoId) return;
 
             const formData = new FormData(this);
             const pedidoData = Object.fromEntries(formData.entries());
 
             try {
-                const response = await fetch(`/api/pedidos/${editandoPedidoId}`, {
+                const response = await fetch(`${API_BASE}/api/pedidos/${editandoPedidoId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(pedidoData)
                 });
 
                 if (!response.ok) {
-                    const errorData = await response.json();
+                    const errorData = await response.json().catch(() => ({}));
                     throw new Error(errorData.mensaje || 'Error al actualizar pedido');
                 }
 
@@ -464,17 +482,17 @@
             }
         });
 
-        // Cambiar estado de pedido
+        // Cambiar estado
         async function cambiarEstado(id, nuevoEstado) {
             try {
-                const response = await fetch(`/api/pedidos/${id}/estado`, {
+                const response = await fetch(`${API_BASE}/api/pedidos/${id}/estado`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ estado: nuevoEstado })
                 });
 
                 if (!response.ok) {
-                    const errorData = await response.json();
+                    const errorData = await response.json().catch(() => ({}));
                     throw new Error(errorData.mensaje || 'Error al cambiar estado');
                 }
 
@@ -489,17 +507,13 @@
 
         // Eliminar pedido
         async function eliminarPedido(id) {
-            if (!confirm('¿Estás seguro de que quieres eliminar este pedido?')) {
-                return;
-            }
+            if (!confirm('¿Estás seguro de que quieres eliminar este pedido?')) return;
 
             try {
-                const response = await fetch(`/api/pedidos/${id}`, {
-                    method: 'DELETE'
-                });
+                const response = await fetch(`${API_BASE}/api/pedidos/${id}`, { method: 'DELETE' });
 
                 if (!response.ok) {
-                    const errorData = await response.json();
+                    const errorData = await response.json().catch(() => ({}));
                     throw new Error(errorData.mensaje || 'Error al eliminar pedido');
                 }
 
@@ -512,36 +526,26 @@
             }
         }
 
-        // Función para mostrar loading
+        // Loading + mensajes
         function mostrarLoading(mostrar) {
             const loading = document.getElementById('loading');
             loading.style.display = mostrar ? 'block' : 'none';
         }
-
-        // Función para mostrar mensajes
         function mostrarMensaje(mensaje, tipo = 'info') {
             const alertDiv = document.createElement('div');
             alertDiv.className = `alert ${tipo}`;
             alertDiv.textContent = mensaje;
-            
-            // Insertar al inicio del body
             document.body.insertBefore(alertDiv, document.body.firstChild);
-            
-            // Remover después de 4 segundos
-            setTimeout(() => {
-                alertDiv.remove();
-            }, 4000);
+            setTimeout(() => alertDiv.remove(), 4000);
         }
 
-        // Cerrar modales al hacer click fuera
+        // Cerrar modal si clic fuera
         window.onclick = function(event) {
             const modalEditar = document.getElementById('modalEditarPedido');
-            if (event.target === modalEditar) {
-                cerrarModalEditar();
-            }
+            if (event.target === modalEditar) cerrarModalEditar();
         }
 
-        // Actualizar automáticamente cada 30 segundos
+        // Auto-refresh
         setInterval(() => {
             cargarPedidos();
             cargarEstadisticas();

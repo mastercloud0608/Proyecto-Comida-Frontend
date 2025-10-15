@@ -31,6 +31,16 @@
     </div>
 
     <script>
+        // === BASE API (prod/local) ===
+        const API_BASE = location.hostname.endsWith('netlify.app')
+          ? 'https://proyecto-comida-backend.onrender.com' // <-- tu backend público
+          : 'http://localhost:3000';
+
+        // Si ya está logueado, ir al dashboard
+        if (localStorage.getItem('isLoggedIn') === 'true') {
+            window.location.href = 'dashboard.html';
+        }
+
         // Manejar el envío del formulario
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -55,29 +65,29 @@
                 submitBtn.textContent = 'Iniciando sesión...';
                 submitBtn.disabled = true;
 
-                const response = await fetch('http://localhost:3000/auth/login', {
+                const response = await fetch(`${API_BASE}/auth/login`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password }),
                 });
 
-                const result = await response.json();
+                const result = await response.json().catch(() => ({}));
 
                 if (response.ok) {
                     showSuccess('Login exitoso. Redirigiendo...');
                     
                     // Guardar información del usuario en localStorage
                     localStorage.setItem('isLoggedIn', 'true');
-                    localStorage.setItem('userId', result.usuario.id);
-                    localStorage.setItem('username', result.usuario.username);
-                    localStorage.setItem('loginTime', new Date().getTime());
+                    if (result.usuario) {
+                        localStorage.setItem('userId', result.usuario.id);
+                        localStorage.setItem('username', result.usuario.username);
+                    }
+                    localStorage.setItem('loginTime', String(Date.now()));
                     
                     // Redirigir después de un breve delay
                     setTimeout(() => {
                         window.location.href = 'dashboard.html';
-                    }, 1500);
+                    }, 1200);
                 } else {
                     showError(result.mensaje || 'Error al iniciar sesión');
                 }
@@ -88,7 +98,7 @@
 
             } catch (error) {
                 console.error('Error de conexión:', error);
-                showError('Error de conexión. Verifica tu conexión a internet e intenta de nuevo.');
+                showError('Error de conexión. Verifica tu internet e intenta de nuevo.');
                 
                 // Restaurar botón
                 const submitBtn = document.querySelector('button[type="submit"]');
@@ -115,11 +125,6 @@
         window.addEventListener('load', () => {
             document.getElementById('username').focus();
         });
-
-        // Verificar si ya está logueado
-        if (localStorage.getItem('isLoggedIn') === 'true') {
-            window.location.href = 'dashboard.html';
-        }
     </script>
 </body>
 </html>

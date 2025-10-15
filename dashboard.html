@@ -14,10 +14,10 @@
         </div>
         <nav>
             <ul>
-                <li><a href="#" aria-label="Ir a inicio">Inicio</a></li>
-                <li><a href="#" aria-label="Ver ventas">Ventas</a></li>
-                <li><a href="#" aria-label="Ver impacto">Impacto</a></li>
-                <li><a href="#" aria-label="Gestionar usuarios">Usuarios</a></li>
+                <li><a href="index.html" aria-label="Ir a inicio">Inicio</a></li>
+                <li><a href="#statistics" aria-label="Ver ventas">Ventas</a></li>
+                <li><a href="#statistics" aria-label="Ver impacto">Impacto</a></li>
+                <li><a href="pedidos.html" aria-label="Gestionar pedidos">Pedidos</a></li>
                 <li><a href="#" id="logout-btn" aria-label="Cerrar sesión">Cerrar sesión</a></li>
             </ul>
         </nav>
@@ -37,7 +37,7 @@
             <div class="benefits-container">
                 <div class="benefit">
                     <h3 id="waste-reduced">Cargando...</h3>
-                    <p>Desperdicio de comida reducido este mes</p>
+                    <p>Desperdicio de comida reducido (estimado)</p>
                 </div>
                 <div class="benefit">
                     <h3 id="money-saved">Cargando...</h3>
@@ -45,7 +45,7 @@
                 </div>
                 <div class="benefit">
                     <h3 id="active-users">Cargando...</h3>
-                    <p>Usuarios activos en la plataforma</p>
+                    <p>Usuarios activos (emails únicos)</p>
                 </div>
             </div>
         </section>
@@ -76,17 +76,17 @@
                 <div class="benefit">
                     <h3>Gestión de Productos</h3>
                     <p>Administra el inventario de productos disponibles y sus precios.</p>
-                    <a href="#" class="btn" style="margin-top: 15px;">Gestionar Productos</a>
+                    <a href="comida.html" class="btn" style="margin-top: 15px;">Gestionar Productos</a>
                 </div>
                 <div class="benefit">
                     <h3>Reportes y Analytics</h3>
                     <p>Accede a reportes detallados sobre ventas, usuarios e impacto ambiental.</p>
-                    <a href="#" class="btn" style="margin-top: 15px;">Ver Reportes</a>
+                    <a href="#statistics" class="btn" style="margin-top: 15px;">Ver Reportes</a>
                 </div>
                 <div class="benefit">
                     <h3>Configuración</h3>
                     <p>Configura parámetros de la plataforma y preferencias del sistema.</p>
-                    <a href="#" class="btn" style="margin-top: 15px;">Configurar</a>
+                    <a href="index.html#contacto" class="btn" style="margin-top: 15px;">Configurar</a>
                 </div>
             </div>
         </section>
@@ -98,12 +98,22 @@
     </footer>
 
     <script>
+        // === BASE API (prod/local) ===
+        const API_BASE = location.hostname.endsWith('netlify.app')
+          ? 'https://proyecto-comida-backend.onrender.com' // <-- tu backend público
+          : 'http://localhost:3000';
+
         // Verificar autenticación al cargar la página
         window.addEventListener('load', () => {
             checkAuthentication();
             displayWelcomeMessage();
             loadDashboardData();
         });
+
+        // Prevenir acceso directo sin autenticación
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            window.location.replace('index.html'); // allí está tu login modal
+        }
 
         // Función para verificar autenticación
         function checkAuthentication() {
@@ -112,51 +122,77 @@
             
             if (!isLoggedIn || isLoggedIn !== 'true') {
                 alert('Debes iniciar sesión para acceder al dashboard.');
-                window.location.href = 'login.html';
+                window.location.replace('index.html');
                 return;
             }
-            
-            // Verificar si la sesión no ha expirado (opcional: expira después de 24 horas)
+            // Expirar a las 24h
             if (loginTime) {
-                const currentTime = new Date().getTime();
-                const sessionDuration = 24 * 60 * 60 * 1000; // 24 horas en milisegundos
-                
+                const currentTime = Date.now();
+                const sessionDuration = 24 * 60 * 60 * 1000; // 24h
                 if (currentTime - parseInt(loginTime) > sessionDuration) {
                     alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
                     logout();
-                    return;
                 }
             }
-            
-            console.log('Usuario autenticado correctamente');
         }
 
         // Mostrar mensaje de bienvenida personalizado
         function displayWelcomeMessage() {
             const username = localStorage.getItem('username');
             const welcomeElement = document.getElementById('welcome-user');
-            
             if (username && welcomeElement) {
                 welcomeElement.textContent = `Bienvenido, ${username}`;
             }
         }
 
-        // Cargar datos del dashboard
+        // Helper para normalizar {items, meta} o []
+        const asArray = (data) => Array.isArray(data) ? data : (data?.items || []);
+
+        // Cargar datos del dashboard (desde tu API)
         async function loadDashboardData() {
             try {
-                // Simular carga de datos del servidor
-                // En una implementación real, harías fetch a tu API
-                setTimeout(() => {
-                    updateStatistics({
-                        wasteReduced: Math.floor(Math.random() * 2000) + 1000,
-                        moneySaved: Math.floor(Math.random() * 5000) + 2000,
-                        activeUsers: Math.floor(Math.random() * 800) + 200
-                    });
-                }, 1000);
-                
+                // 1) Resumen de estadísticas de pedidos
+                const statsResp = await fetch(`${API_BASE}/api/pedidos/estadisticas/resumen`);
+                if (!statsResp.ok) throw new Error('Stats no disponibles');
+                const stats = await statsResp.json();
+
+                // Total de pedidos
+                const totalPedidos = stats.total_pedidos ?? 0;
+
+                // Ventas totales (preferimos sumar por_estado si existe)
+                const totalVentas = Array.isArray(stats.por_estado)
+                    ? stats.por_estado.reduce((sum, e) => sum + parseFloat(e.total_ventas || 0), 0)
+                    : parseFloat(stats.estadisticas_hoy?.ventas_hoy || 0);
+
+                // Desperdicio evitado (estimación 2.5 kg por pedido)
+                const co2KgPorComida = 2.5;
+                const wasteReducedKg = Math.round(totalPedidos * co2KgPorComida);
+
+                // 2) Usuarios activos (emails únicos en últimos N pedidos)
+                let activeUsers = 0;
+                try {
+                    const pedidosResp = await fetch(`${API_BASE}/api/pedidos?limit=200`);
+                    if (pedidosResp.ok) {
+                        const data = await pedidosResp.json();
+                        const pedidos = asArray(data);
+                        const setEmails = new Set(
+                            pedidos
+                              .map(p => (p.email_cliente || '').trim().toLowerCase())
+                              .filter(Boolean)
+                        );
+                        activeUsers = setEmails.size;
+                    }
+                } catch { /* silencioso */ }
+
+                updateStatistics({
+                    wasteReduced: wasteReducedKg,
+                    moneySaved: totalVentas,
+                    activeUsers
+                });
+
             } catch (error) {
                 console.error('Error loading dashboard data:', error);
-                // Mostrar datos por defecto en caso de error
+                // Fallback por si la API no responde
                 updateStatistics({
                     wasteReduced: 1250,
                     moneySaved: 3420,
@@ -172,20 +208,20 @@
             const usersElement = document.getElementById('active-users');
 
             if (wasteElement) {
-                wasteElement.textContent = `${data.wasteReduced.toLocaleString()} kg`;
+                wasteElement.textContent = `${Number(data.wasteReduced || 0).toLocaleString()} kg`;
             }
             if (moneyElement) {
-                moneyElement.textContent = `$${data.moneySaved.toLocaleString()}`;
+                const monto = Number(data.moneySaved || 0);
+                moneyElement.textContent = `Bs ${monto.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             }
             if (usersElement) {
-                usersElement.textContent = data.activeUsers.toLocaleString();
+                usersElement.textContent = Number(data.activeUsers || 0).toLocaleString();
             }
         }
 
         // Manejar cierre de sesión
         document.getElementById('logout-btn').addEventListener('click', (e) => {
             e.preventDefault();
-            
             if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
                 logout();
             }
@@ -193,27 +229,17 @@
 
         // Función de logout
         function logout() {
-            // Limpiar todos los datos de sesión
             localStorage.removeItem('isLoggedIn');
             localStorage.removeItem('userId');
             localStorage.removeItem('username');
             localStorage.removeItem('loginTime');
-            
-            // Limpiar cualquier otro dato de sesión
             sessionStorage.clear();
-            
-            // Redirigir al login
             alert('Sesión cerrada exitosamente.');
-            window.location.href = 'login.html';
+            window.location.replace('index.html');
         }
 
         // Actualizar estadísticas cada 30 segundos
         setInterval(loadDashboardData, 30000);
-
-        // Prevenir acceso directo a la página sin autenticación
-        if (localStorage.getItem('isLoggedIn') !== 'true') {
-            window.location.href = 'login.html';
-        }
     </script>
 </body>
 </html>
