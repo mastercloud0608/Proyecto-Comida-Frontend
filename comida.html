@@ -101,209 +101,90 @@
         <p>&copy; 2025 Comida Sobrante. Proyecto de Responsabilidad Social - Unidad Educativa Padre Jaime Gagnon 1</p>
     </footer>
 
-    <script>
-        let comidas = [];
-        let editandoId = null;
+   <script>
+  // === NUEVO: base de la API para prod y local ===
+  const API_BASE = location.hostname.endsWith('netlify.app')
+    ? 'https://proyecto-comida-backend.onrender.com'  // <-- pon aquí tu dominio del backend (Railway/Render/etc)
+    : 'http://localhost:3000';
 
-        // Cargar comidas al iniciar
-        document.addEventListener('DOMContentLoaded', function() {
-            cargarComidas();
-        });
+  let comidas = [];
+  let editandoId = null;
 
-        // Función para cargar todas las comidas
-        async function cargarComidas() {
-            try {
-                mostrarLoading(true);
-                const response = await fetch('/api/comidas');
-                if (!response.ok) throw new Error('Error al cargar comidas');
-                
-                comidas = await response.json();
-                mostrarComidas(comidas);
-            } catch (error) {
-                console.error('Error:', error);
-                mostrarMensaje('Error al cargar las comidas', 'error');
-            } finally {
-                mostrarLoading(false);
-            }
-        }
+  document.addEventListener('DOMContentLoaded', function() {
+      cargarComidas();
+  });
 
-        // Función para mostrar comidas en el grid
-        function mostrarComidas(comidasArray) {
-            const container = document.getElementById('comidasContainer');
-            
-            if (comidasArray.length === 0) {
-                container.innerHTML = '<div class="no-results">No hay comidas disponibles</div>';
-                return;
-            }
+  // Cargar todas las comidas
+  async function cargarComidas() {
+      try {
+          mostrarLoading(true);
+          const response = await fetch(`${API_BASE}/api/comidas`);
+          if (!response.ok) throw new Error('Error al cargar comidas');
 
-            container.innerHTML = comidasArray.map(comida => `
-                <div class="comida-card">
-                    <div class="comida-header">
-                        <h3>${comida.nombre}</h3>
-                        <span class="categoria-badge ${comida.categoria?.toLowerCase() || 'default'}">${comida.categoria || 'Sin categoría'}</span>
-                    </div>
-                    <div class="comida-info">
-                        <div class="precio">Bs ${parseFloat(comida.precio).toFixed(2)}</div>
-                        <div class="comida-id">ID: ${comida.id}</div>
-                    </div>
-                    <div class="comida-actions">
-                        <button class="btn-edit" onclick="editarComida(${comida.id})">Editar</button>
-                        <button class="btn-delete" onclick="eliminarComida(${comida.id})">Eliminar</button>
-                        <button class="btn-order" onclick="hacerPedido(${comida.id})">Hacer Pedido</button>
-                    </div>
-                </div>
-            `).join('');
-        }
+          const data = await response.json();
+          // tu backend devuelve { items, meta }. Aseguramos array:
+          comidas = Array.isArray(data) ? data : (data.items || []);
+          mostrarComidas(comidas);
+      } catch (error) {
+          console.error('Error:', error);
+          mostrarMensaje('Error al cargar las comidas', 'error');
+      } finally {
+          mostrarLoading(false);
+      }
+  }
 
-        // Función para filtrar comidas
-        function filtrarComidas() {
-            const filtroCategoria = document.getElementById('filtroCategoria').value;
-            let comidasFiltradas = comidas;
+  // Envío del formulario (crear/actualizar)
+  document.getElementById('formComida').addEventListener('submit', async function(e) {
+      e.preventDefault();
 
-            if (filtroCategoria) {
-                comidasFiltradas = comidas.filter(comida => 
-                    comida.categoria === filtroCategoria
-                );
-            }
+      const nombre = document.getElementById('nombre').value;
+      const categoria = document.getElementById('categoria').value;
+      const precio = parseFloat(document.getElementById('precio').value);
+      const comidaData = { nombre, categoria, precio };
 
-            mostrarComidas(comidasFiltradas);
-        }
+      try {
+          let response;
+          if (editandoId) {
+              response = await fetch(`${API_BASE}/api/comidas/${editandoId}`, {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(comidaData)
+              });
+          } else {
+              response = await fetch(`${API_BASE}/api/comidas`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(comidaData)
+              });
+          }
 
-        // Mostrar formulario para agregar/editar
-        function mostrarFormulario(comida = null) {
-            const modal = document.getElementById('modalComida');
-            const titulo = document.getElementById('tituloModal');
-            const btnSubmit = document.getElementById('btnSubmit');
-            const form = document.getElementById('formComida');
+          if (!response.ok) throw new Error('Error al procesar la solicitud');
 
-            if (comida) {
-                // Editando
-                titulo.textContent = 'Editar Comida';
-                btnSubmit.textContent = 'Actualizar Comida';
-                document.getElementById('comidaId').value = comida.id;
-                document.getElementById('nombre').value = comida.nombre;
-                document.getElementById('categoria').value = comida.categoria || '';
-                document.getElementById('precio').value = comida.precio;
-                editandoId = comida.id;
-            } else {
-                // Agregando
-                titulo.textContent = 'Agregar Nueva Comida';
-                btnSubmit.textContent = 'Agregar Comida';
-                form.reset();
-                editandoId = null;
-            }
+          mostrarMensaje(editandoId ? 'Comida actualizada exitosamente' : 'Comida agregada exitosamente', 'success');
+          cerrarFormulario();
+          cargarComidas();
+      } catch (error) {
+          console.error('Error:', error);
+          mostrarMensaje('Error al guardar la comida', 'error');
+      }
+  });
 
-            modal.style.display = 'block';
-        }
+  // Eliminar
+  async function eliminarComida(id) {
+      if (!confirm('¿Estás seguro de que quieres eliminar esta comida?')) return;
 
-        // Cerrar formulario
-        function cerrarFormulario() {
-            document.getElementById('modalComida').style.display = 'none';
-            document.getElementById('formComida').reset();
-            editandoId = null;
-        }
+      try {
+          const response = await fetch(`${API_BASE}/api/comidas/${id}`, { method: 'DELETE' });
+          if (!response.ok) throw new Error('Error al eliminar');
 
-        // Manejar envío del formulario
-        document.getElementById('formComida').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const nombre = document.getElementById('nombre').value;
-            const categoria = document.getElementById('categoria').value;
-            const precio = parseFloat(document.getElementById('precio').value);
+          mostrarMensaje('Comida eliminada exitosamente', 'success');
+          cargarComidas();
+      } catch (error) {
+          console.error('Error:', error);
+          mostrarMensaje('Error al eliminar la comida', 'error');
+      }
+  }
+</script>
 
-            const comidaData = { nombre, categoria, precio };
-
-            try {
-                let response;
-                if (editandoId) {
-                    // Actualizando
-                    response = await fetch(`/api/comidas/${editandoId}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(comidaData)
-                    });
-                } else {
-                    // Creando
-                    response = await fetch('/api/comidas', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(comidaData)
-                    });
-                }
-
-                if (!response.ok) throw new Error('Error al procesar la solicitud');
-
-                mostrarMensaje(editandoId ? 'Comida actualizada exitosamente' : 'Comida agregada exitosamente', 'success');
-                cerrarFormulario();
-                cargarComidas();
-            } catch (error) {
-                console.error('Error:', error);
-                mostrarMensaje('Error al guardar la comida', 'error');
-            }
-        });
-
-        // Función para editar comida
-        function editarComida(id) {
-            const comida = comidas.find(c => c.id === id);
-            if (comida) {
-                mostrarFormulario(comida);
-            }
-        }
-
-        // Función para eliminar comida
-        async function eliminarComida(id) {
-            if (!confirm('¿Estás seguro de que quieres eliminar esta comida?')) {
-                return;
-            }
-
-            try {
-                const response = await fetch(`/api/comidas/${id}`, {
-                    method: 'DELETE'
-                });
-
-                if (!response.ok) throw new Error('Error al eliminar');
-
-                mostrarMensaje('Comida eliminada exitosamente', 'success');
-                cargarComidas();
-            } catch (error) {
-                console.error('Error:', error);
-                mostrarMensaje('Error al eliminar la comida', 'error');
-            }
-        }
-
-        // Función para hacer pedido
-        function hacerPedido(comidaId) {
-            window.location.href = `pedidos.html?comida=${comidaId}`;
-        }
-
-        // Función para mostrar loading
-        function mostrarLoading(mostrar) {
-            const loading = document.getElementById('loading');
-            loading.style.display = mostrar ? 'block' : 'none';
-        }
-
-        // Función para mostrar mensajes
-        function mostrarMensaje(mensaje, tipo = 'info') {
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert ${tipo}`;
-            alertDiv.textContent = mensaje;
-            
-            // Insertar al inicio del body
-            document.body.insertBefore(alertDiv, document.body.firstChild);
-            
-            // Remover después de 3 segundos
-            setTimeout(() => {
-                alertDiv.remove();
-            }, 3000);
-        }
-
-        // Cerrar modal al hacer click fuera
-        window.onclick = function(event) {
-            const modal = document.getElementById('modalComida');
-            if (event.target === modal) {
-                cerrarFormulario();
-            }
-        }
-    </script>
 </body>
 </html>
