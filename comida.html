@@ -1,190 +1,278 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Comidas - Comida Sobrante</title>
-    <link rel="stylesheet" href="assets/styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gestión de Comidas - Comida Sobrante</title>
+  <link rel="stylesheet" href="assets/styles.css"/>
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <div class="logo">
-            <h1>Comida Sobrante</h1>
-            <p>Reduciendo el desperdicio, alimentando el futuro</p>
-        </div>
-        <nav>
-            <ul>
-                <li><a href="index.html">Inicio</a></li>
-                <li><a href="comida.html">Comidas</a></li>
-                <li><a href="pedidos.html">Pedidos</a></li>
-                <li><a href="#" onclick="mostrarFormulario()">Agregar Comida</a></li>
-            </ul>
-        </nav>
-    </header>
-
-    <!-- Hero Section -->
-    <section class="hero">
-        <h2>Gestión de Comidas Disponibles</h2>
-        <p>Administra y visualiza todas las comidas disponibles en la plataforma</p>
-    </section>
-
-    <!-- Filtros -->
-    <section class="filters">
-        <div class="filter-container">
-            <h3>Filtrar por Categoría</h3>
-            <select id="filtroCategoria">
-                <option value="">Todas las categorías</option>
-                <option value="Desayuno">Desayuno</option>
-                <option value="Almuerzo">Almuerzo</option>
-                <option value="Cena">Cena</option>
-                <option value="Postre">Postre</option>
-                <option value="Bebida">Bebida</option>
-                <option value="Snack">Snack</option>
-            </select>
-            <button onclick="filtrarComidas()">Filtrar</button>
-            <button onclick="cargarComidas()">Mostrar Todas</button>
-        </div>
-    </section>
-
-    <!-- Lista de Comidas -->
-    <section class="comidas-section">
-        <div class="comidas-header">
-            <h2>Comidas Disponibles</h2>
-            <div class="loading" id="loading" style="display: none;">Cargando...</div>
-        </div>
-        <div class="comidas-grid" id="comidasContainer">
-            <!-- Las comidas se cargarán dinámicamente aquí -->
-        </div>
-    </section>
-
-    <!-- Modal para Agregar/Editar Comida -->
-    <div id="modalComida" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="cerrarFormulario()">&times;</span>
-            <h2 id="tituloModal">Agregar Nueva Comida</h2>
-            <form id="formComida">
-                <div class="form-group">
-                    <label for="nombre">Nombre de la Comida:</label>
-                    <input type="text" id="nombre" name="nombre" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="categoria">Categoría:</label>
-                    <select id="categoria" name="categoria">
-                        <option value="Desayuno">Desayuno</option>
-                        <option value="Almuerzo">Almuerzo</option>
-                        <option value="Cena">Cena</option>
-                        <option value="Postre">Postre</option>
-                        <option value="Bebida">Bebida</option>
-                        <option value="Snack">Snack</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="precio">Precio (Bs):</label>
-                    <input type="number" id="precio" name="precio" step="0.01" min="0" required>
-                </div>
-                
-                <div class="form-actions">
-                    <button type="submit" id="btnSubmit">Agregar Comida</button>
-                    <button type="button" onclick="cerrarFormulario()">Cancelar</button>
-                </div>
-                
-                <input type="hidden" id="comidaId">
-            </form>
-        </div>
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <h1>Comida Sobrante</h1>
+      <p>Reduciendo el desperdicio, alimentando el futuro</p>
     </div>
+    <nav>
+      <ul>
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="comida.html">Comidas</a></li>
+        <li><a href="pedidos.html">Pedidos</a></li>
+        <li><a href="#" onclick="mostrarFormulario()">Agregar Comida</a></li>
+      </ul>
+    </nav>
+  </header>
 
-    <!-- Footer -->
-    <footer>
-        <p>&copy; 2025 Comida Sobrante. Proyecto de Responsabilidad Social - Unidad Educativa Padre Jaime Gagnon 1</p>
-    </footer>
+  <!-- Hero Section -->
+  <section class="hero">
+    <h2>Gestión de Comidas Disponibles</h2>
+    <p>Administra y visualiza todas las comidas disponibles en la plataforma</p>
+  </section>
 
-   <script>
-  // === NUEVO: base de la API para prod y local ===
-  const API_BASE = location.hostname.endsWith('netlify.app')
-    ? 'https://proyecto-comida-backend.onrender.com'  // <-- pon aquí tu dominio del backend (Railway/Render/etc)
-    : 'http://localhost:3000';
+  <!-- Filtros -->
+  <section class="filters">
+    <div class="filter-container">
+      <h3>Filtrar por Categoría</h3>
+      <select id="filtroCategoria">
+        <option value="">Todas las categorías</option>
+        <option value="Desayuno">Desayuno</option>
+        <option value="Almuerzo">Almuerzo</option>
+        <option value="Cena">Cena</option>
+        <option value="Postre">Postre</option>
+        <option value="Bebida">Bebida</option>
+        <option value="Snack">Snack</option>
+      </select>
+      <button onclick="filtrarComidas()">Filtrar</button>
+      <button onclick="cargarComidas()">Mostrar Todas</button>
+    </div>
+  </section>
 
-  let comidas = [];
-  let editandoId = null;
+  <!-- Lista de Comidas -->
+  <section class="comidas-section">
+    <div class="comidas-header">
+      <h2>Comidas Disponibles</h2>
+      <div class="loading" id="loading" style="display:none;">Cargando...</div>
+    </div>
+    <div class="comidas-grid" id="comidasContainer"></div>
+  </section>
 
-  document.addEventListener('DOMContentLoaded', function() {
+  <!-- Modal para Agregar/Editar Comida -->
+  <div id="modalComida" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="cerrarFormulario()">&times;</span>
+      <h2 id="tituloModal">Agregar Nueva Comida</h2>
+      <form id="formComida">
+        <div class="form-group">
+          <label for="nombre">Nombre de la Comida:</label>
+          <input type="text" id="nombre" name="nombre" required>
+        </div>
+        <div class="form-group">
+          <label for="categoria">Categoría:</label>
+          <select id="categoria" name="categoria">
+            <option value="Desayuno">Desayuno</option>
+            <option value="Almuerzo">Almuerzo</option>
+            <option value="Cena">Cena</option>
+            <option value="Postre">Postre</option>
+            <option value="Bebida">Bebida</option>
+            <option value="Snack">Snack</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="precio">Precio (Bs):</label>
+          <input type="number" id="precio" name="precio" step="0.01" min="0" required>
+        </div>
+        <div class="form-actions">
+          <button type="submit" id="btnSubmit">Agregar Comida</button>
+          <button type="button" onclick="cerrarFormulario()">Cancelar</button>
+        </div>
+        <input type="hidden" id="comidaId">
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 Comida Sobrante. Proyecto de Responsabilidad Social - Unidad Educativa Padre Jaime Gagnon 1</p>
+  </footer>
+
+  <script>
+    // === BASE API (prod/local) ===
+    const API_BASE = location.hostname.endsWith('netlify.app')
+      ? 'https://proyecto-comida-backend.onrender.com'
+      : 'http://localhost:3000';
+
+    let comidas = [];
+    let editandoId = null;
+
+    const asArray = (data) => Array.isArray(data) ? data : (data?.items || []);
+
+    document.addEventListener('DOMContentLoaded', () => {
       cargarComidas();
-  });
+    });
 
-  // Cargar todas las comidas
-  async function cargarComidas() {
+    // Loading helper
+    function mostrarLoading(mostrar) {
+      const el = document.getElementById('loading');
+      if (el) el.style.display = mostrar ? 'block' : 'none';
+    }
+
+    // Mensajes
+    function mostrarMensaje(mensaje, tipo='info') {
+      const alertDiv = document.createElement('div');
+      alertDiv.className = `alert ${tipo}`;
+      alertDiv.textContent = mensaje;
+      document.body.insertBefore(alertDiv, document.body.firstChild);
+      setTimeout(() => alertDiv.remove(), 3000);
+    }
+
+    // Cargar todas las comidas
+    async function cargarComidas() {
       try {
-          mostrarLoading(true);
-          const response = await fetch(`${API_BASE}/api/comidas`);
-          if (!response.ok) throw new Error('Error al cargar comidas');
-
-          const data = await response.json();
-          // tu backend devuelve { items, meta }. Aseguramos array:
-          comidas = Array.isArray(data) ? data : (data.items || []);
-          mostrarComidas(comidas);
-      } catch (error) {
-          console.error('Error:', error);
-          mostrarMensaje('Error al cargar las comidas', 'error');
+        mostrarLoading(true);
+        const resp = await fetch(`${API_BASE}/api/comidas`);
+        if (!resp.ok) throw new Error('Error al cargar comidas');
+        const data = await resp.json();
+        comidas = asArray(data);
+        mostrarComidas(comidas);
+      } catch (err) {
+        console.error(err);
+        mostrarMensaje('Error al cargar las comidas', 'error');
       } finally {
-          mostrarLoading(false);
+        mostrarLoading(false);
       }
-  }
+    }
 
-  // Envío del formulario (crear/actualizar)
-  document.getElementById('formComida').addEventListener('submit', async function(e) {
+    // Render
+    function mostrarComidas(comidasArray) {
+      const container = document.getElementById('comidasContainer');
+      if (!comidasArray.length) {
+        container.innerHTML = '<div class="no-results">No hay comidas disponibles</div>';
+        return;
+      }
+      container.innerHTML = comidasArray.map(comida => {
+        const categoria = comida.categoria || 'Sin categoría';
+        const badgeClass = (comida.categoria || 'default').toLowerCase();
+        const precio = (comida.precio != null) ? Number(comida.precio) : 0;
+        return `
+          <div class="comida-card">
+            <div class="comida-header">
+              <h3>${comida.nombre}</h3>
+              <span class="categoria-badge ${badgeClass}">${categoria}</span>
+            </div>
+            <div class="comida-info">
+              <div class="precio">Bs ${precio.toFixed(2)}</div>
+              <div class="comida-id">ID: ${comida.id}</div>
+            </div>
+            <div class="comida-actions">
+              <button class="btn-edit" onclick="editarComida(${comida.id})">Editar</button>
+              <button class="btn-delete" onclick="eliminarComida(${comida.id})">Eliminar</button>
+              <button class="btn-order" onclick="hacerPedido(${comida.id})">Hacer Pedido</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Filtro
+    function filtrarComidas() {
+      const filtro = document.getElementById('filtroCategoria').value;
+      const arr = filtro ? comidas.filter(c => c.categoria === filtro) : comidas;
+      mostrarComidas(arr);
+    }
+
+    // Formulario
+    function mostrarFormulario(comida=null) {
+      const modal = document.getElementById('modalComida');
+      const titulo = document.getElementById('tituloModal');
+      const btnSubmit = document.getElementById('btnSubmit');
+      const form = document.getElementById('formComida');
+
+      if (comida) {
+        titulo.textContent = 'Editar Comida';
+        btnSubmit.textContent = 'Actualizar Comida';
+        document.getElementById('comidaId').value = comida.id;
+        document.getElementById('nombre').value = comida.nombre;
+        document.getElementById('categoria').value = comida.categoria || '';
+        document.getElementById('precio').value = comida.precio;
+        editandoId = comida.id;
+      } else {
+        titulo.textContent = 'Agregar Nueva Comida';
+        btnSubmit.textContent = 'Agregar Comida';
+        form.reset();
+        editandoId = null;
+      }
+      modal.style.display = 'block';
+    }
+
+    function cerrarFormulario() {
+      document.getElementById('modalComida').style.display = 'none';
+      document.getElementById('formComida').reset();
+      editandoId = null;
+    }
+
+    // Submit crear/editar
+    document.getElementById('formComida').addEventListener('submit', async (e) => {
       e.preventDefault();
-
       const nombre = document.getElementById('nombre').value;
       const categoria = document.getElementById('categoria').value;
       const precio = parseFloat(document.getElementById('precio').value);
       const comidaData = { nombre, categoria, precio };
 
       try {
-          let response;
-          if (editandoId) {
-              response = await fetch(`${API_BASE}/api/comidas/${editandoId}`, {
-                  method: 'PUT',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(comidaData)
-              });
-          } else {
-              response = await fetch(`${API_BASE}/api/comidas`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(comidaData)
-              });
-          }
-
-          if (!response.ok) throw new Error('Error al procesar la solicitud');
-
-          mostrarMensaje(editandoId ? 'Comida actualizada exitosamente' : 'Comida agregada exitosamente', 'success');
-          cerrarFormulario();
-          cargarComidas();
-      } catch (error) {
-          console.error('Error:', error);
-          mostrarMensaje('Error al guardar la comida', 'error');
+        let resp;
+        if (editandoId) {
+          resp = await fetch(`${API_BASE}/api/comidas/${editandoId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(comidaData)
+          });
+        } else {
+          resp = await fetch(`${API_BASE}/api/comidas`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(comidaData)
+          });
+        }
+        if (!resp.ok) throw new Error('Error al procesar la solicitud');
+        mostrarMensaje(editandoId ? 'Comida actualizada exitosamente' : 'Comida agregada exitosamente', 'success');
+        cerrarFormulario();
+        cargarComidas();
+      } catch (err) {
+        console.error(err);
+        mostrarMensaje('Error al guardar la comida', 'error');
       }
-  });
+    });
 
-  // Eliminar
-  async function eliminarComida(id) {
+    // Editar
+    function editarComida(id) {
+      const comida = comidas.find(c => c.id === id);
+      if (comida) mostrarFormulario(comida);
+    }
+
+    // Eliminar
+    async function eliminarComida(id) {
       if (!confirm('¿Estás seguro de que quieres eliminar esta comida?')) return;
-
       try {
-          const response = await fetch(`${API_BASE}/api/comidas/${id}`, { method: 'DELETE' });
-          if (!response.ok) throw new Error('Error al eliminar');
-
-          mostrarMensaje('Comida eliminada exitosamente', 'success');
-          cargarComidas();
-      } catch (error) {
-          console.error('Error:', error);
-          mostrarMensaje('Error al eliminar la comida', 'error');
+        const resp = await fetch(`${API_BASE}/api/comidas/${id}`, { method: 'DELETE' });
+        if (!resp.ok) throw new Error('Error al eliminar');
+        mostrarMensaje('Comida eliminada exitosamente', 'success');
+        cargarComidas();
+      } catch (err) {
+        console.error(err);
+        mostrarMensaje('Error al eliminar la comida', 'error');
       }
-  }
-</script>
+    }
 
+    // Ir a pedidos con la comida preseleccionada
+    function hacerPedido(comidaId) {
+      window.location.href = `pedidos.html?comida=${comidaId}`;
+    }
+
+    // Cerrar modal al hacer click fuera
+    window.onclick = function (event) {
+      const modal = document.getElementById('modalComida');
+      if (event.target === modal) cerrarFormulario();
+    };
+  </script>
 </body>
 </html>
