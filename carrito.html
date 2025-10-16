@@ -485,6 +485,7 @@
         let carrito = null;
         let stripe = null;
         let elements = null;
+        let paymentElement = null;
         let paymentIntentClientSecret = null;
 
         function generateSessionId() {
@@ -735,30 +736,48 @@
         // Mostrar modal de pago
         async function mostrarModalPago(clientSecret) {
             const modal = document.getElementById('modalPago');
+            const paymentContainer = document.getElementById('payment-element');
+            
+            // Limpiar cualquier instancia anterior
+            if (paymentElement) {
+                paymentElement.unmount();
+                paymentElement = null;
+            }
+            if (elements) {
+                elements = null;
+            }
+            
+            paymentContainer.innerHTML = '<div style="text-align: center; padding: 2rem; color: #666;">Cargando formulario de pago...</div>';
             modal.style.display = 'block';
 
-            // Limpiar contenedor anterior si existe
-            const paymentElement = document.getElementById('payment-element');
-            paymentElement.innerHTML = '<div style="text-align: center; padding: 2rem;">Cargando formulario de pago...</div>';
-
             try {
-                // Crear Stripe Elements
-                elements = stripe.elements({ clientSecret });
-                const payment = elements.create('payment');
+                // Crear nuevos Elements
+                elements = stripe.elements({ 
+                    clientSecret,
+                    appearance: {
+                        theme: 'stripe',
+                    }
+                });
                 
-                // Esperar a que el elemento esté montado
-                await payment.mount('#payment-element');
-                console.log('Payment element montado correctamente');
+                // Crear y montar el Payment Element
+                paymentElement = elements.create('payment', {
+                    layout: 'tabs'
+                });
+                
+                // Esperar a que se monte
+                await paymentElement.mount('#payment-element');
+                console.log('✅ Payment element montado correctamente');
 
-                // Configurar formulario de pago
+                // Configurar el formulario después de montar
                 const form = document.getElementById('payment-form');
                 form.onsubmit = async (e) => {
                     e.preventDefault();
+                    console.log('📝 Formulario enviado, confirmando pago...');
                     await confirmarPago();
                 };
             } catch (error) {
-                console.error('Error al montar payment element:', error);
-                paymentElement.innerHTML = '<div class="error-message">Error al cargar el formulario de pago. Por favor, intenta nuevamente.</div>';
+                console.error('❌ Error al montar payment element:', error);
+                paymentContainer.innerHTML = '<div class="error-message">Error al cargar el formulario de pago. Por favor, recarga la página e intenta nuevamente.</div>';
                 mostrarMensajePago('Error al cargar el formulario de pago', 'error');
             }
         }
@@ -767,12 +786,23 @@
             const modal = document.getElementById('modalPago');
             modal.style.display = 'none';
             
-            // Limpiar elementos de Stripe
+            // Desmontar y limpiar elementos de Stripe
+            if (paymentElement) {
+                try {
+                    paymentElement.unmount();
+                } catch (e) {
+                    console.log('No se pudo desmontar el elemento:', e);
+                }
+                paymentElement = null;
+            }
+            
             if (elements) {
-                const paymentElement = document.getElementById('payment-element');
-                paymentElement.innerHTML = '';
                 elements = null;
             }
+            
+            // Limpiar contenedor
+            const paymentContainer = document.getElementById('payment-element');
+            paymentContainer.innerHTML = '';
             
             // Limpiar mensajes
             document.getElementById('pagoMensaje').innerHTML = '';
@@ -788,8 +818,13 @@
 
         // Confirmar pago
         async function confirmarPago() {
-            if (!elements) {
-                mostrarMensajePago('Error: Elementos de pago no inicializados', 'error');
+            console.log('🔍 Verificando estado antes de confirmar...');
+            console.log('Elements:', !!elements);
+            console.log('PaymentElement:', !!paymentElement);
+
+            if (!elements || !paymentElement) {
+                console.error('❌ Elementos de pago no están disponibles');
+                mostrarMensajePago('Error: Elementos de pago no inicializados. Por favor, cierra este modal y vuelve a intentarlo.', 'error');
                 return;
             }
 
@@ -802,16 +837,18 @@
             spinner.style.display = 'inline';
 
             try {
+                console.log('💳 Iniciando confirmación de pago...');
+                
                 const { error, paymentIntent } = await stripe.confirmPayment({
                     elements,
                     confirmParams: {
-                        return_url: window.location.origin + '/carrito.html?success=true',
+                        return_url: window.location.origin + '/pedidos.html',
                     },
                     redirect: 'if_required'
                 });
 
                 if (error) {
-                    console.error('Error en confirmPayment:', error);
+                    console.error('❌ Error en confirmPayment:', error);
                     mostrarMensajePago(error.message, 'error');
                     submitButton.disabled = false;
                     buttonText.style.display = 'inline';
@@ -820,9 +857,10 @@
                 }
 
                 if (paymentIntent && paymentIntent.status === 'succeeded') {
-                    console.log('Pago exitoso:', paymentIntent.id);
+                    console.log('✅ Pago exitoso:', paymentIntent.id);
                     
                     // Confirmar en el backend
+                    console.log('📤 Confirmando en el backend...');
                     const confirmResponse = await fetch(`${API_BASE}/api/checkout/confirm`, {
                         method: 'POST',
                         headers: { 
@@ -833,10 +871,14 @@
                     });
 
                     if (!confirmResponse.ok) {
-                        throw new Error('Error al confirmar el pedido en el servidor');
+                        const errorData = await confirmResponse.json();
+                        throw new Error(errorData.mensaje || 'Error al confirmar el pedido en el servidor');
                     }
 
-                    mostrarMensajePago('¡Pago exitoso! Redirigiendo...', 'exito');
+                    const confirmData = await confirmResponse.json();
+                    console.log('✅ Pedido confirmado en el backend:', confirmData);
+
+                    mostrarMensajePago('¡Pago exitoso! Redirigiendo a tus pedidos...', 'exito');
                     
                     // Limpiar session del carrito
                     localStorage.removeItem('session_id');
@@ -845,13 +887,14 @@
                         window.location.href = 'pedidos.html';
                     }, 2000);
                 } else {
+                    console.warn('⚠️ Pago no completado. Estado:', paymentIntent?.status);
                     mostrarMensajePago('El pago no se completó. Estado: ' + (paymentIntent?.status || 'desconocido'), 'error');
                     submitButton.disabled = false;
                     buttonText.style.display = 'inline';
                     spinner.style.display = 'none';
                 }
             } catch (error) {
-                console.error('Error al confirmar pago:', error);
+                console.error('❌ Error al confirmar pago:', error);
                 mostrarMensajePago('Error al procesar el pago: ' + error.message, 'error');
                 submitButton.disabled = false;
                 buttonText.style.display = 'inline';
