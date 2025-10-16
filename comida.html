@@ -5,6 +5,71 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Gestión de Comidas - Comida Sobrante</title>
   <link rel="stylesheet" href="assets/styles.css"/>
+  <style>
+    /* Estilos adicionales para las imágenes */
+    .comida-card {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    .comida-image-container {
+      width: 100%;
+      height: 200px;
+      overflow: hidden;
+      background: #f0f0f0;
+      position: relative;
+    }
+    
+    .comida-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+    
+    .comida-card:hover .comida-image {
+      transform: scale(1.05);
+    }
+    
+    .comida-image-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-size: 3rem;
+    }
+    
+    .form-group.image-preview {
+      text-align: center;
+    }
+    
+    .image-preview-container {
+      margin-top: 10px;
+      max-width: 300px;
+      max-height: 200px;
+      overflow: hidden;
+      border-radius: 8px;
+      border: 2px solid #ddd;
+      display: inline-block;
+    }
+    
+    .image-preview-container img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    
+    .no-image-preview {
+      padding: 40px;
+      background: #f5f5f5;
+      color: #999;
+      font-style: italic;
+    }
+  </style>
 </head>
 <body>
   <!-- Header -->
@@ -81,6 +146,16 @@
           <label for="precio">Precio (Bs):</label>
           <input type="number" id="precio" name="precio" step="0.01" min="0" required>
         </div>
+        <div class="form-group">
+          <label for="imagen">URL de la Imagen:</label>
+          <input type="url" id="imagen" name="imagen" placeholder="https://ejemplo.com/imagen.jpg">
+          <small>Ingresa la URL completa de la imagen (opcional)</small>
+        </div>
+        <div class="form-group image-preview">
+          <div class="image-preview-container" id="imagePreviewContainer">
+            <div class="no-image-preview">Vista previa de la imagen</div>
+          </div>
+        </div>
         <div class="form-actions">
           <button type="submit" id="btnSubmit">Agregar Comida</button>
           <button type="button" onclick="cerrarFormulario()">Cancelar</button>
@@ -108,6 +183,11 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       cargarComidas();
+      
+      // Preview de imagen en tiempo real
+      document.getElementById('imagen').addEventListener('input', (e) => {
+        actualizarPreviewImagen(e.target.value);
+      });
     });
 
     // Loading helper
@@ -123,6 +203,26 @@
       alertDiv.textContent = mensaje;
       document.body.insertBefore(alertDiv, document.body.firstChild);
       setTimeout(() => alertDiv.remove(), 3000);
+    }
+
+    // Preview de imagen
+    function actualizarPreviewImagen(url) {
+      const container = document.getElementById('imagePreviewContainer');
+      if (!url || url.trim() === '') {
+        container.innerHTML = '<div class="no-image-preview">Vista previa de la imagen</div>';
+        return;
+      }
+      
+      const img = document.createElement('img');
+      img.src = url;
+      img.alt = 'Preview';
+      img.onerror = () => {
+        container.innerHTML = '<div class="no-image-preview">⚠️ URL de imagen no válida</div>';
+      };
+      img.onload = () => {
+        container.innerHTML = '';
+        container.appendChild(img);
+      };
     }
 
     // Cargar todas las comidas
@@ -153,8 +253,17 @@
         const categoria = comida.categoria || 'Sin categoría';
         const badgeClass = (comida.categoria || 'default').toLowerCase();
         const precio = (comida.precio != null) ? Number(comida.precio) : 0;
+        
+        // Imagen o placeholder
+        const imagenHtml = comida.imagen 
+          ? `<img src="${comida.imagen}" alt="${comida.nombre}" class="comida-image" onerror="this.parentElement.innerHTML='<div class=\\'comida-image-placeholder\\'>🍽️</div>'">` 
+          : `<div class="comida-image-placeholder">🍽️</div>`;
+        
         return `
           <div class="comida-card">
+            <div class="comida-image-container">
+              ${imagenHtml}
+            </div>
             <div class="comida-header">
               <h3>${comida.nombre}</h3>
               <span class="categoria-badge ${badgeClass}">${categoria}</span>
@@ -194,11 +303,14 @@
         document.getElementById('nombre').value = comida.nombre;
         document.getElementById('categoria').value = comida.categoria || '';
         document.getElementById('precio').value = comida.precio;
+        document.getElementById('imagen').value = comida.imagen || '';
+        actualizarPreviewImagen(comida.imagen || '');
         editandoId = comida.id;
       } else {
         titulo.textContent = 'Agregar Nueva Comida';
         btnSubmit.textContent = 'Agregar Comida';
         form.reset();
+        actualizarPreviewImagen('');
         editandoId = null;
       }
       modal.style.display = 'block';
@@ -207,6 +319,7 @@
     function cerrarFormulario() {
       document.getElementById('modalComida').style.display = 'none';
       document.getElementById('formComida').reset();
+      actualizarPreviewImagen('');
       editandoId = null;
     }
 
@@ -216,7 +329,14 @@
       const nombre = document.getElementById('nombre').value;
       const categoria = document.getElementById('categoria').value;
       const precio = parseFloat(document.getElementById('precio').value);
-      const comidaData = { nombre, categoria, precio };
+      const imagen = document.getElementById('imagen').value.trim();
+      
+      const comidaData = { 
+        nombre, 
+        categoria, 
+        precio,
+        imagen: imagen || null
+      };
 
       try {
         let resp;
