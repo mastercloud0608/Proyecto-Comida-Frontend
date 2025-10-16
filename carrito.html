@@ -214,7 +214,7 @@
             margin-top: 1rem;
         }
 
-        .btn-proceder-pago:hover {
+        .btn-proceder-pago:hover:not(:disabled) {
             background: #45a049;
         }
 
@@ -260,6 +260,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.5);
+            overflow-y: auto;
         }
 
         .modal-pago-content {
@@ -268,6 +269,8 @@
             padding: 2rem;
             max-width: 500px;
             border-radius: 8px;
+            max-height: 85vh;
+            overflow-y: auto;
         }
 
         #payment-element {
@@ -286,7 +289,7 @@
             cursor: pointer;
         }
 
-        .btn-pagar:hover {
+        .btn-pagar:hover:not(:disabled) {
             background: #5469d4;
         }
 
@@ -335,6 +338,7 @@
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             z-index: 10000;
+            animation: slideInAlert 0.3s ease;
         }
 
         .alert.success {
@@ -345,6 +349,26 @@
         .alert.error {
             background: #f8d7da;
             color: #721c24;
+        }
+
+        @keyframes slideInAlert {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+            border: 1px solid #f5c6cb;
         }
     </style>
 </head>
@@ -436,12 +460,12 @@
             <div id="pagoMensaje"></div>
             <form id="payment-form">
                 <div id="payment-element"></div>
-                <button id="btnPagar" class="btn-pagar">
+                <button id="btnPagar" class="btn-pagar" type="submit">
                     <span id="button-text">Pagar Ahora</span>
                     <span id="spinner" style="display:none;">Procesando...</span>
                 </button>
             </form>
-            <button onclick="cerrarModalPago()" style="margin-top: 1rem; width: 100%; padding: 0.5rem; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            <button type="button" onclick="cerrarModalPago()" style="margin-top: 1rem; width: 100%; padding: 0.5rem; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer;">
                 Cancelar
             </button>
         </div>
@@ -453,7 +477,7 @@
     </footer>
 
     <script>
-        const API_BASE = location.hostname.endsWith('netlify.app')
+        const API_BASE = location.hostname.includes('netlify.app') || location.hostname.includes('github.io')
             ? 'https://proyecto-comida-backend.onrender.com'
             : 'http://localhost:3000';
 
@@ -480,8 +504,10 @@
         async function inicializarStripe() {
             try {
                 const response = await fetch(`${API_BASE}/api/checkout/config`);
+                if (!response.ok) throw new Error('No se pudo obtener configuración de Stripe');
                 const { publishableKey } = await response.json();
                 stripe = Stripe(publishableKey);
+                console.log('Stripe inicializado correctamente');
             } catch (error) {
                 console.error('Error al inicializar Stripe:', error);
                 mostrarMensaje('Error al inicializar sistema de pagos', 'error');
@@ -516,12 +542,13 @@
                 if (!response.ok) throw new Error('Error al cargar carrito');
                 
                 carrito = await response.json();
+                console.log('Carrito cargado:', carrito);
                 renderizarCarrito();
                 actualizarResumen();
                 validarFormulario();
             } catch (error) {
                 console.error('Error:', error);
-                mostrarMensaje('Error al cargar el carrito', 'error');
+                mostrarMensaje('Error al cargar el carrito. Verifica la conexión con el servidor.', 'error');
             }
         }
 
@@ -550,7 +577,7 @@
                     }
                     <div class="item-info">
                         <h4>${item.nombre}</h4>
-                        <span class="item-categoria">${item.categoria}</span>
+                        <span class="item-categoria">${item.categoria || 'Sin categoría'}</span>
                         <div class="item-controles">
                             <div class="cantidad-control">
                                 <button onclick="cambiarCantidad(${item.id}, ${item.cantidad - 1})">−</button>
@@ -562,8 +589,8 @@
                         ${item.notas ? `<p style="margin-top:0.5rem;font-size:0.875rem;color:#666;"><strong>Nota:</strong> ${item.notas}</p>` : ''}
                     </div>
                     <div class="item-precio">
-                        <div class="precio-unitario">Bs ${parseFloat(item.precio_unitario).toFixed(2)} c/u</div>
-                        <div class="precio-total">Bs ${parseFloat(item.subtotal).toFixed(2)}</div>
+                        <div class="precio-unitario">Bs ${parseFloat(item.precio_unitario || 0).toFixed(2)} c/u</div>
+                        <div class="precio-total">Bs ${parseFloat(item.subtotal || 0).toFixed(2)}</div>
                     </div>
                 </div>
             `).join('');
@@ -628,13 +655,33 @@
 
         // Procesar pago
         async function procesarPago() {
-            try {
-                // Guardar información del cliente
-                const nombre = document.getElementById('nombreCliente').value;
-                const email = document.getElementById('emailCliente').value;
-                const telefono = document.getElementById('telefonoCliente').value;
-                const direccion = document.getElementById('direccion').value;
+            const btn = document.getElementById('btnProcederPago');
+            btn.disabled = true;
+            btn.textContent = 'Procesando...';
 
+            try {
+                // Validar que el carrito no esté vacío
+                if (!carrito || !carrito.items || carrito.items.length === 0) {
+                    throw new Error('El carrito está vacío');
+                }
+
+                // Validar que el total sea mayor a 0
+                const total = parseFloat(carrito.resumen?.total || 0);
+                if (total <= 0) {
+                    throw new Error('El total del carrito debe ser mayor a 0');
+                }
+
+                // Guardar información del cliente
+                const nombre = document.getElementById('nombreCliente').value.trim();
+                const email = document.getElementById('emailCliente').value.trim();
+                const telefono = document.getElementById('telefonoCliente').value.trim();
+                const direccion = document.getElementById('direccion').value.trim();
+
+                if (!nombre || !email) {
+                    throw new Error('Por favor completa los campos obligatorios');
+                }
+
+                console.log('Guardando información del cliente...');
                 const responseInfo = await fetch(`${API_BASE}/api/carrito/info`, {
                     method: 'PUT',
                     headers: {
@@ -644,14 +691,18 @@
                     body: JSON.stringify({
                         nombre_cliente: nombre,
                         email_cliente: email,
-                        telefono_cliente: telefono,
-                        direccion: direccion
+                        telefono_cliente: telefono || null,
+                        direccion: direccion || null
                     })
                 });
 
-                if (!responseInfo.ok) throw new Error('Error al guardar información');
+                if (!responseInfo.ok) {
+                    const errorData = await responseInfo.json();
+                    throw new Error(errorData.mensaje || 'Error al guardar información del cliente');
+                }
 
                 // Crear Payment Intent
+                console.log('Creando payment intent...');
                 const response = await fetch(`${API_BASE}/api/checkout/create-payment-intent`, {
                     method: 'POST',
                     headers: {
@@ -661,19 +712,23 @@
                 });
 
                 if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.mensaje || 'Error al crear pago');
+                    const errorData = await response.json();
+                    throw new Error(errorData.mensaje || 'Error al crear la intención de pago');
                 }
 
                 const { clientSecret, amount } = await response.json();
+                console.log('Payment intent creado exitosamente');
                 paymentIntentClientSecret = clientSecret;
 
                 // Mostrar modal de pago
                 mostrarModalPago(clientSecret);
 
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error al procesar pago:', error);
                 mostrarMensaje(error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Proceder al Pago';
             }
         }
 
@@ -682,10 +737,14 @@
             const modal = document.getElementById('modalPago');
             modal.style.display = 'block';
 
+            // Limpiar contenedor anterior si existe
+            const paymentElement = document.getElementById('payment-element');
+            paymentElement.innerHTML = '';
+
             // Crear Stripe Elements
             elements = stripe.elements({ clientSecret });
-            const paymentElement = elements.create('payment');
-            paymentElement.mount('#payment-element');
+            const payment = elements.create('payment');
+            payment.mount('#payment-element');
 
             // Configurar formulario de pago
             const form = document.getElementById('payment-form');
@@ -729,11 +788,14 @@
                     return;
                 }
 
-                if (paymentIntent.status === 'succeeded') {
+                if (paymentIntent && paymentIntent.status === 'succeeded') {
                     // Confirmar en el backend
                     await fetch(`${API_BASE}/api/checkout/confirm`, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'x-session-id': sessionId
+                        },
                         body: JSON.stringify({ paymentIntentId: paymentIntent.id })
                     });
 
@@ -761,13 +823,21 @@
             alertDiv.className = `alert ${tipo}`;
             alertDiv.textContent = mensaje;
             document.body.appendChild(alertDiv);
-            setTimeout(() => alertDiv.remove(), 3000);
+            setTimeout(() => alertDiv.remove(), 4000);
         }
 
         function mostrarMensajePago(mensaje, tipo) {
             const container = document.getElementById('pagoMensaje');
             container.innerHTML = `<div class="pago-mensaje ${tipo}">${mensaje}</div>`;
         }
+
+        // Cerrar modal al hacer clic fuera
+        window.onclick = function(event) {
+            const modal = document.getElementById('modalPago');
+            if (event.target === modal) {
+                cerrarModalPago();
+            }
+        };
     </script>
 </body>
 </html>
