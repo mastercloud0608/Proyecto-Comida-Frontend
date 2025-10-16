@@ -116,15 +116,20 @@
       width: 100%;
       height: 100%;
       background: rgba(0,0,0,0.5);
+      overflow-y: auto;
+      padding: 20px 0;
     }
 
     .modal-add-cart-content {
       background: white;
-      margin: 10% auto;
+      margin: 50px auto;
       padding: 2rem;
       max-width: 500px;
+      width: 90%;
       border-radius: 12px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      max-height: calc(100vh - 100px);
+      overflow-y: auto;
     }
 
     .cantidad-selector {
@@ -184,6 +189,28 @@
 
     .btn-add-cart:hover {
       background: #45a049;
+    }
+
+    .btn-cancel-cart {
+      width: 100%;
+      padding: 0.75rem;
+      background: #666;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    .btn-cancel-cart:hover {
+      background: #555;
+    }
+
+    .modal-add-cart h2 {
+      margin-bottom: 1rem;
+      color: #333;
     }
 
     .alert {
@@ -341,7 +368,7 @@
         <textarea id="notasModal" class="notas-textarea" placeholder="Ej: Sin cebolla, extra picante, etc."></textarea>
       </div>
       <button class="btn-add-cart" onclick="confirmarAgregarCarrito()">Agregar al Carrito</button>
-      <button type="button" onclick="cerrarModalCart()" style="width: 100%; padding: 0.75rem; background: #666; color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 0.5rem;">Cancelar</button>
+      <button type="button" class="btn-cancel-cart" onclick="cerrarModalCart()">Cancelar</button>
     </div>
   </div>
 
@@ -352,7 +379,7 @@
 
   <script>
     // === BASE API (prod/local) ===
-    const API_BASE = location.hostname.endsWith('netlify.app')
+    const API_BASE = location.hostname.includes('netlify.app') || location.hostname.includes('github.io')
       ? 'https://proyecto-comida-backend.onrender.com'
       : 'http://localhost:3000';
 
@@ -428,7 +455,7 @@
         mostrarComidas(comidas);
       } catch (err) {
         console.error(err);
-        mostrarMensaje('Error al cargar las comidas', 'error');
+        mostrarMensaje('Error al cargar las comidas. Verifica la conexión con el servidor.', 'error');
       } finally {
         mostrarLoading(false);
       }
@@ -551,7 +578,7 @@
         cargarComidas();
       } catch (err) {
         console.error(err);
-        mostrarMensaje('Error al guardar la comida', 'error');
+        mostrarMensaje('Error al guardar la comida. Verifica la conexión con el servidor.', 'error');
       }
     });
 
@@ -571,7 +598,7 @@
         cargarComidas();
       } catch (err) {
         console.error(err);
-        mostrarMensaje('Error al eliminar la comida', 'error');
+        mostrarMensaje('Error al eliminar la comida. Verifica la conexión con el servidor.', 'error');
       }
     }
 
@@ -656,7 +683,7 @@
         actualizarContadorCarrito();
       } catch (err) {
         console.error(err);
-        mostrarMensaje('Error al agregar al carrito', 'error');
+        mostrarMensaje('Error al agregar al carrito. Verifica la conexión con el servidor.', 'error');
       }
     }
 
