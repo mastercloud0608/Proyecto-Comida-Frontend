@@ -733,25 +733,41 @@
             }
         }
 
-        // Mostrar modal de pago
+// Mostrar modal de pago
         async function mostrarModalPago(clientSecret) {
             const modal = document.getElementById('modalPago');
             const paymentContainer = document.getElementById('payment-element');
             
-            // Limpiar cualquier instancia anterior
+            // Limpiar mensajes anteriores
+            document.getElementById('pagoMensaje').innerHTML = '';
+            
+            // Limpiar cualquier instancia anterior de forma segura
             if (paymentElement) {
-                paymentElement.unmount();
+                try {
+                    paymentElement.unmount();
+                } catch (e) {
+                    console.log('Elemento ya desmontado');
+                }
                 paymentElement = null;
             }
             if (elements) {
                 elements = null;
             }
             
-            paymentContainer.innerHTML = '<div style="text-align: center; padding: 2rem; color: #666;">Cargando formulario de pago...</div>';
+            // Limpiar el contenedor
+            paymentContainer.innerHTML = '';
+            
+            // Mostrar modal con mensaje de carga
             modal.style.display = 'block';
+            paymentContainer.innerHTML = '<div style="text-align: center; padding: 2rem; color: #666;">Cargando formulario de pago...</div>';
+
+            // Pequeño delay para asegurar que el modal está visible
+            await new Promise(resolve => setTimeout(resolve, 100));
 
             try {
-                // Crear nuevos Elements
+                console.log('🔧 Inicializando Stripe Elements...');
+                
+                // Crear nuevos Elements con el clientSecret
                 elements = stripe.elements({ 
                     clientSecret,
                     appearance: {
@@ -759,26 +775,39 @@
                     }
                 });
                 
-                // Crear y montar el Payment Element
+                console.log('📦 Elements creado, creando Payment Element...');
+                
+                // Limpiar el contenedor nuevamente antes de montar
+                paymentContainer.innerHTML = '';
+                
+                // Crear el Payment Element
                 paymentElement = elements.create('payment', {
                     layout: 'tabs'
                 });
                 
-                // Esperar a que se monte
+                console.log('🎨 Payment Element creado, montando...');
+                
+                // Montar el Payment Element
                 await paymentElement.mount('#payment-element');
-                console.log('✅ Payment element montado correctamente');
-
-                // Configurar el formulario después de montar
+                
+                // Verificar que se montó correctamente
+                await new Promise(resolve => setTimeout(resolve, 200));
+                
+                console.log('✅ Payment Element montado exitosamente');
+                
+                // El formulario ya tiene el event listener configurado en el HTML
+                // pero lo reforzamos aquí para asegurar
                 const form = document.getElementById('payment-form');
                 form.onsubmit = async (e) => {
                     e.preventDefault();
                     console.log('📝 Formulario enviado, confirmando pago...');
                     await confirmarPago();
                 };
+                
             } catch (error) {
                 console.error('❌ Error al montar payment element:', error);
-                paymentContainer.innerHTML = '<div class="error-message">Error al cargar el formulario de pago. Por favor, recarga la página e intenta nuevamente.</div>';
-                mostrarMensajePago('Error al cargar el formulario de pago', 'error');
+                paymentContainer.innerHTML = '<div class="error-message">Error al cargar el formulario de pago. Por favor, cierra este modal e intenta nuevamente.</div>';
+                mostrarMensajePago('Error al cargar el formulario de pago: ' + error.message, 'error');
             }
         }
 
