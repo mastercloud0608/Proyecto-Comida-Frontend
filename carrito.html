@@ -720,8 +720,7 @@ async function procesarPago() {
         btn.textContent = 'Proceder al Pago';
     }
 }
-
-// Mostrar modal de pago
+// Mostrar modal de pago (modo CardElement)
 async function mostrarModalPago(clientSecret) {
     const modal = document.getElementById('modalPago');
     const container = document.getElementById('payment-element');
@@ -731,42 +730,88 @@ async function mostrarModalPago(clientSecret) {
     mensaje.innerHTML = '';
     container.innerHTML = '<div style="text-align:center;padding:2rem;color:#666;">Cargando formulario de pago...</div>';
 
-    await new Promise(r => setTimeout(r, 200)); // asegurar visibilidad del modal
+    await new Promise(r => setTimeout(r, 200));
 
     try {
         if (!stripe) throw new Error('Stripe no inicializado');
 
-        console.log('🔧 Inicializando Stripe Elements...');
-        // Crear solo si aún no existe o cambió el clientSecret
-        if (!elements || paymentIntentClientSecret !== clientSecret) {
-            elements = stripe.elements({ clientSecret, appearance: { theme: 'stripe' } });
-            paymentElement = elements.create('payment', { layout: 'tabs' });
-            container.innerHTML = '';
-            paymentElement.mount('#payment-element');
-            console.log('✅ Payment Element montado correctamente');
-        }
+        console.log('🔧 Inicializando Stripe CardElement...');
+        elements = stripe.elements({ appearance: { theme: 'stripe' } });
+
+        // Crear y montar el CardElement
+        const cardElement = elements.create('card', { style: { base: { fontSize: '16px' } } });
+        container.innerHTML = '';
+        cardElement.mount('#payment-element');
+        console.log('✅ CardElement montado correctamente');
 
         // Asignar listener al formulario
         const form = document.getElementById('payment-form');
         form.onsubmit = async (e) => {
             e.preventDefault();
-            console.log('📝 Enviando formulario de pago...');
-            await confirmarPago();
+            await confirmarPago(cardElement, clientSecret);
         };
 
     } catch (error) {
-        console.error('❌ Error al montar Stripe Elements:', error);
+        console.error('❌ Error al montar CardElement:', error);
         mensaje.innerHTML = `<div class="pago-mensaje error">Error al cargar el formulario: ${error.message}</div>`;
     }
 }
 
-// Cerrar modal de pago
-function cerrarModalPago() {
-    const modal = document.getElementById('modalPago');
-    modal.style.display = 'none';
+// Confirmar pago (modo CardElement)
+async function confirmarPago(cardElement, clientSecret) {
+    const submitButton = document.getElementById('btnPagar');
+    const buttonText = document.getElementById('button-text');
+    const spinner = document.getElementById('spinner');
 
-    // ⚠️ No desmontamos el PaymentElement para mantener referencia activa
-    document.getElementById('pagoMensaje').innerHTML = '';
+    submitButton.disabled = true;
+    buttonText.style.display = 'none';
+    spinner.style.display = 'inline';
+
+    try {
+        console.log('🚀 Enviando confirmación a Stripe...');
+        const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+            payment_method: {
+                card: cardElement,
+                billing_details: {
+                    name: document.getElementById('nombreCliente').value.trim(),
+                    email: document.getElementById('emailCliente').value.trim(),
+                },
+            },
+        });
+
+        if (error) {
+            throw new Error(error.message);
+        }
+
+        if (paymentIntent && paymentIntent.status === 'succeeded') {
+            console.log('✅ Pago exitoso:', paymentIntent.id);
+
+            // Confirmar en tu backend
+            const confirmResponse = await fetch(`${API_BASE}/api/checkout/confirm`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-session-id': sessionId,
+                },
+                body: JSON.stringify({ paymentIntentId: paymentIntent.id }),
+            });
+
+            if (!confirmResponse.ok) throw new Error('Error al confirmar el pedido en el servidor');
+
+            mostrarMensajePago('¡Pago exitoso! Redirigiendo a tus pedidos...', 'exito');
+            localStorage.removeItem('session_id');
+            setTimeout(() => (window.location.href = 'pedidos.html'), 2000);
+        } else {
+            mostrarMensajePago(`Pago no completado (estado: ${paymentIntent?.status})`, 'error');
+        }
+    } catch (error) {
+        console.error('❌ Error al confirmar pago:', error);
+        mostrarMensajePago(error.message || 'Error al procesar el pago', 'error');
+    } finally {
+        submitButton.disabled = false;
+        buttonText.style.display = 'inline';
+        spinner.style.display = 'none';
+    }
 }
 
 // Confirmar pago
