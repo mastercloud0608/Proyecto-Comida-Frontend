@@ -734,82 +734,53 @@
         }
 
 // Mostrar modal de pago
-        async function mostrarModalPago(clientSecret) {
-            const modal = document.getElementById('modalPago');
-            const paymentContainer = document.getElementById('payment-element');
-            
-            // Limpiar mensajes anteriores
-            document.getElementById('pagoMensaje').innerHTML = '';
-            
-            // Limpiar cualquier instancia anterior de forma segura
-            if (paymentElement) {
-                try {
-                    paymentElement.unmount();
-                } catch (e) {
-                    console.log('Elemento ya desmontado');
-                }
-                paymentElement = null;
-            }
-            if (elements) {
-                elements = null;
-            }
-            
-            // Limpiar el contenedor
-            paymentContainer.innerHTML = '';
-            
-            // Mostrar modal con mensaje de carga
-            modal.style.display = 'block';
-            paymentContainer.innerHTML = '<div style="text-align: center; padding: 2rem; color: #666;">Cargando formulario de pago...</div>';
+async function mostrarModalPago(clientSecret) {
+    const modal = document.getElementById('modalPago');
+    const paymentContainer = document.getElementById('payment-element');
+    const mensaje = document.getElementById('pagoMensaje');
 
-            // Pequeño delay para asegurar que el modal está visible
-            await new Promise(resolve => setTimeout(resolve, 100));
+    // Mostrar modal y limpiar mensajes
+    modal.style.display = 'block';
+    mensaje.innerHTML = '';
+    paymentContainer.innerHTML = '<div style="text-align:center;padding:2rem;color:#666;">Cargando...</div>';
 
-            try {
-                console.log('🔧 Inicializando Stripe Elements...');
-                
-                // Crear nuevos Elements con el clientSecret
-                elements = stripe.elements({ 
-                    clientSecret,
-                    appearance: {
-                        theme: 'stripe',
-                    }
-                });
-                
-                console.log('📦 Elements creado, creando Payment Element...');
-                
-                // Limpiar el contenedor nuevamente antes de montar
-                paymentContainer.innerHTML = '';
-                
-                // Crear el Payment Element
-                paymentElement = elements.create('payment', {
-                    layout: 'tabs'
-                });
-                
-                console.log('🎨 Payment Element creado, montando...');
-                
-                // Montar el Payment Element
-                await paymentElement.mount('#payment-element');
-                
-                // Verificar que se montó correctamente
-                await new Promise(resolve => setTimeout(resolve, 200));
-                
-                console.log('✅ Payment Element montado exitosamente');
-                
-                // El formulario ya tiene el event listener configurado en el HTML
-                // pero lo reforzamos aquí para asegurar
-                const form = document.getElementById('payment-form');
-                form.onsubmit = async (e) => {
-                    e.preventDefault();
-                    console.log('📝 Formulario enviado, confirmando pago...');
-                    await confirmarPago();
-                };
-                
-            } catch (error) {
-                console.error('❌ Error al montar payment element:', error);
-                paymentContainer.innerHTML = '<div class="error-message">Error al cargar el formulario de pago. Por favor, cierra este modal e intenta nuevamente.</div>';
-                mostrarMensajePago('Error al cargar el formulario de pago: ' + error.message, 'error');
-            }
-        }
+    // Esperar un instante a que el modal esté visible (importante para Stripe)
+    await new Promise(r => setTimeout(r, 150));
+
+    try {
+        console.log('🔧 Inicializando Stripe Elements...');
+        console.log('ClientSecret recibido:', clientSecret);
+
+        // Crear nuevos Elements con el clientSecret del backend
+        elements = stripe.elements({
+            clientSecret,
+            appearance: { theme: 'stripe' }
+        });
+
+        // Crear el Payment Element
+        paymentElement = elements.create('payment', { layout: 'tabs' });
+
+        // Montar el Payment Element
+        paymentContainer.innerHTML = '';
+        paymentElement.mount('#payment-element');
+        console.log('✅ Payment Element montado correctamente');
+
+        // Asegurar que el formulario dispare confirmación
+        const form = document.getElementById('payment-form');
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            console.log('📝 Enviando formulario de pago...');
+            await confirmarPago();
+        };
+
+    } catch (error) {
+        console.error('❌ Error al inicializar Stripe Elements:', error);
+        mensaje.innerHTML = `<div class="pago-mensaje error">
+            Error al cargar el formulario de pago. ${error.message}
+        </div>`;
+    }
+}
+
 
         function cerrarModalPago() {
             const modal = document.getElementById('modalPago');
