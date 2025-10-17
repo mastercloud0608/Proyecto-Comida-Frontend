@@ -720,6 +720,7 @@ async function procesarPago() {
         btn.textContent = 'Proceder al Pago';
     }
 }
+
 // Mostrar modal de pago (modo CardElement)
 async function mostrarModalPago(clientSecret) {
     const modal = document.getElementById('modalPago');
@@ -730,7 +731,7 @@ async function mostrarModalPago(clientSecret) {
     mensaje.innerHTML = '';
     container.innerHTML = '<div style="text-align:center;padding:2rem;color:#666;">Cargando formulario de pago...</div>';
 
-    await new Promise(r => setTimeout(r, 200));
+    await new Promise(r => setTimeout(r, 200)); // pequeña pausa visual
 
     try {
         if (!stripe) throw new Error('Stripe no inicializado');
@@ -739,17 +740,27 @@ async function mostrarModalPago(clientSecret) {
         elements = stripe.elements({ appearance: { theme: 'stripe' } });
 
         // Crear y montar el CardElement
-        const cardElement = elements.create('card', { style: { base: { fontSize: '16px' } } });
+        const cardElement = elements.create('card', {
+            style: {
+                base: {
+                    fontSize: '16px',
+                    color: '#32325d',
+                    '::placeholder': { color: '#aab7c4' }
+                },
+                invalid: { color: '#fa755a' }
+            }
+        });
         container.innerHTML = '';
         cardElement.mount('#payment-element');
         console.log('✅ CardElement montado correctamente');
 
-        // Asignar listener al formulario
+        // Escuchar el submit del formulario
         const form = document.getElementById('payment-form');
-        form.onsubmit = async (e) => {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
+            console.log('📝 Enviando pago con CardElement...');
             await confirmarPago(cardElement, clientSecret);
-        };
+        });
 
     } catch (error) {
         console.error('❌ Error al montar CardElement:', error);
@@ -779,9 +790,7 @@ async function confirmarPago(cardElement, clientSecret) {
             },
         });
 
-        if (error) {
-            throw new Error(error.message);
-        }
+        if (error) throw new Error(error.message);
 
         if (paymentIntent && paymentIntent.status === 'succeeded') {
             console.log('✅ Pago exitoso:', paymentIntent.id);
@@ -814,95 +823,6 @@ async function confirmarPago(cardElement, clientSecret) {
     }
 }
 
-// Confirmar pago
-async function confirmarPago() {
-    console.log('🔍 Verificando estado antes de confirmar...');
-    console.log('Elements:', !!elements);
-    console.log('PaymentElement:', !!paymentElement);
-
-    if (!elements || !paymentElement) {
-        mostrarMensajePago('Error: Elementos de pago no inicializados.', 'error');
-        return;
-    }
-
-    const submitButton = document.getElementById('btnPagar');
-    const buttonText = document.getElementById('button-text');
-    const spinner = document.getElementById('spinner');
-
-    submitButton.disabled = true;
-    buttonText.style.display = 'none';
-    spinner.style.display = 'inline';
-
-    try {
-        console.log('💳 Validando elementos...');
-        const { error: submitError } = await elements.submit();
-        if (submitError) throw submitError;
-
-        console.log('🚀 Confirmando pago con Stripe...');
-        const { error, paymentIntent } = await stripe.confirmPayment({
-            elements,
-            confirmParams: {
-                return_url: window.location.origin + '/pedidos.html'
-            },
-            redirect: 'if_required'
-        });
-
-        if (error) throw error;
-
-        if (paymentIntent && paymentIntent.status === 'succeeded') {
-            console.log('✅ Pago exitoso:', paymentIntent.id);
-
-            const confirmResponse = await fetch(`${API_BASE}/api/checkout/confirm`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-session-id': sessionId
-                },
-                body: JSON.stringify({ paymentIntentId: paymentIntent.id })
-            });
-
-            if (!confirmResponse.ok) throw new Error('Error al confirmar el pedido en el servidor');
-
-            mostrarMensajePago('¡Pago exitoso! Redirigiendo a tus pedidos...', 'exito');
-            localStorage.removeItem('session_id');
-
-            setTimeout(() => window.location.href = 'pedidos.html', 2000);
-        } else {
-            mostrarMensajePago(`Pago no completado (estado: ${paymentIntent?.status})`, 'error');
-        }
-
-    } catch (error) {
-        console.error('❌ Error al confirmar pago:', error);
-        mostrarMensajePago(error.message || 'Error al procesar el pago', 'error');
-    } finally {
-        submitButton.disabled = false;
-        buttonText.style.display = 'inline';
-        spinner.style.display = 'none';
-    }
-}
-
-
-        // Mensajes
-        function mostrarMensaje(mensaje, tipo = 'info') {
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert ${tipo}`;
-            alertDiv.textContent = mensaje;
-            document.body.appendChild(alertDiv);
-            setTimeout(() => alertDiv.remove(), 4000);
-        }
-
-        function mostrarMensajePago(mensaje, tipo) {
-            const container = document.getElementById('pagoMensaje');
-            container.innerHTML = `<div class="pago-mensaje ${tipo}">${mensaje}</div>`;
-        }
-
-        // Cerrar modal al hacer clic fuera
-        window.onclick = function(event) {
-            const modal = document.getElementById('modalPago');
-            if (event.target === modal) {
-                cerrarModalPago();
-            }
-        };
     </script>
 </body>
 </html>
