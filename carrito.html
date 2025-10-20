@@ -41,22 +41,26 @@
             border-bottom: none;
         }
 
-        .item-imagen {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 8px;
-            background: #f0f0f0;
-            flex-shrink: 0;
-        }
-
         .item-info {
             flex: 1;
         }
 
         .item-info h4 {
-            margin: 0 0 0.5rem 0;
+            margin: 0 0 0.25rem 0;
             color: #333;
+        }
+
+        .item-empresa {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .item-empresa i {
+            font-style: normal;
         }
 
         .item-categoria {
@@ -67,6 +71,17 @@
             border-radius: 4px;
             font-size: 0.75rem;
             margin-bottom: 0.5rem;
+        }
+
+        .item-descuento-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            background: #ff5722;
+            color: white;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 0.5rem;
         }
 
         .item-controles {
@@ -107,18 +122,33 @@
 
         .item-precio {
             text-align: right;
-            min-width: 100px;
+            min-width: 120px;
+        }
+
+        .precio-original {
+            font-size: 0.875rem;
+            color: #999;
+            text-decoration: line-through;
+            margin-bottom: 0.25rem;
         }
 
         .precio-unitario {
             font-size: 0.875rem;
             color: #666;
+            margin-bottom: 0.25rem;
+        }
+
+        .precio-con-descuento {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #4CAF50;
         }
 
         .precio-total {
-            font-size: 1.125rem;
+            font-size: 1.25rem;
             font-weight: bold;
             color: #4CAF50;
+            margin-top: 0.25rem;
         }
 
         .btn-eliminar {
@@ -160,6 +190,11 @@
             margin-bottom: 0.75rem;
         }
 
+        .resumen-ahorro {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
         .resumen-total {
             margin-top: 1rem;
             padding-top: 1rem;
@@ -199,6 +234,44 @@
         .form-group textarea:focus {
             outline: none;
             border-color: #4CAF50;
+        }
+
+        .payment-methods {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .payment-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .payment-option:hover {
+            border-color: #4CAF50;
+            background: #f9f9f9;
+        }
+
+        .payment-option input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .payment-option input[type="radio"]:checked ~ span {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        .payment-option span {
+            font-size: 1rem;
         }
 
         .btn-proceder-pago {
@@ -362,13 +435,40 @@
             }
         }
 
-        .error-message {
-            background: #f8d7da;
-            color: #721c24;
+        .qr-code-container {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .qr-code-container img {
+            max-width: 300px;
+            margin: 1rem auto;
+            border: 2px solid #ddd;
+            border-radius: 8px;
             padding: 1rem;
-            border-radius: 4px;
+            background: white;
+        }
+
+        .payment-instructions {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 1rem;
             margin: 1rem 0;
-            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+        }
+
+        .payment-instructions h4 {
+            margin: 0 0 0.5rem 0;
+            color: #1976d2;
+        }
+
+        .payment-instructions ol {
+            margin: 0.5rem 0 0 1.25rem;
+            padding: 0;
+        }
+
+        .payment-instructions li {
+            margin: 0.25rem 0;
         }
     </style>
 </head>
@@ -413,6 +513,10 @@
                 <div class="resumen-linea">
                     <span>Subtotal:</span>
                     <span id="subtotal">Bs 0.00</span>
+                </div>
+                <div class="resumen-linea resumen-ahorro">
+                    <span>🎉 Ahorras:</span>
+                    <span id="ahorro">Bs 0.00</span>
                 </div>
                 <div class="resumen-linea">
                     <span>Impuestos:</span>
@@ -471,18 +575,62 @@
         </div>
     </div>
 
-    <!-- Modal de Pago con Stripe -->
+    <!-- Modal de Pago -->
     <div id="modalPago" class="modal-pago">
         <div class="modal-pago-content">
-            <h3>Completar Pago</h3>
+            <h3 id="modalPagoTitulo">Completar Pago</h3>
             <div id="pagoMensaje"></div>
-            <form id="payment-form">
-                <div id="payment-element"></div>
-                <button id="btnPagar" class="btn-pagar" type="submit">
-                    <span id="button-text">Pagar Ahora</span>
-                    <span id="spinner" style="display:none;">Procesando...</span>
-                </button>
-            </form>
+            
+            <!-- Contenido dinámico según método de pago -->
+            <div id="modalPagoContenido">
+                <!-- Para tarjeta: formulario Stripe -->
+                <form id="payment-form" style="display:none;">
+                    <div id="payment-element"></div>
+                    <button id="btnPagar" class="btn-pagar" type="submit">
+                        <span id="button-text">Pagar Ahora</span>
+                        <span id="spinner" style="display:none;">Procesando...</span>
+                    </button>
+                </form>
+                
+                <!-- Para efectivo -->
+                <div id="efectivo-content" style="display:none;">
+                    <div class="payment-instructions">
+                        <h4>📝 Instrucciones para Pago en Efectivo</h4>
+                        <ol>
+                            <li>Confirma tu pedido haciendo clic en el botón de abajo</li>
+                            <li>Tu pedido quedará reservado por 24 horas</li>
+                            <li>Realiza el pago al momento de recibir tu pedido</li>
+                            <li>Trae el monto exacto: <strong id="efectivo-monto">Bs 0.00</strong></li>
+                        </ol>
+                    </div>
+                    <button id="btnConfirmarEfectivo" class="btn-pagar">
+                        Confirmar Pedido (Pago en Efectivo)
+                    </button>
+                </div>
+                
+                <!-- Para QR -->
+                <div id="qr-content" style="display:none;">
+                    <div class="payment-instructions">
+                        <h4>📱 Instrucciones para Pago QR</h4>
+                        <ol>
+                            <li>Escanea el código QR con tu app bancaria</li>
+                            <li>Verifica el monto: <strong id="qr-monto">Bs 0.00</strong></li>
+                            <li>Completa el pago en tu banco</li>
+                            <li>Haz clic en "Confirmar Pago" una vez realizado</li>
+                        </ol>
+                    </div>
+                    <div class="qr-code-container">
+                        <img id="qr-code-img" src="" alt="Código QR para pago">
+                        <p><strong>Cuenta:</strong> 1234567890</p>
+                        <p><strong>Banco:</strong> Banco Nacional</p>
+                        <p><strong>Nombre:</strong> Comida Sobrante</p>
+                    </div>
+                    <button id="btnConfirmarQR" class="btn-pagar">
+                        Ya Realicé el Pago
+                    </button>
+                </div>
+            </div>
+            
             <button type="button" onclick="cerrarModalPago()" style="margin-top: 1rem; width: 100%; padding: 0.5rem; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer;">
                 Cancelar
             </button>
@@ -494,7 +642,7 @@
         <p>&copy; 2025 Comida Sobrante. Proyecto de Responsabilidad Social</p>
     </footer>
 
-  <script>
+<script>
     const API_BASE = location.hostname.includes('netlify.app') || location.hostname.includes('github.io')
         ? 'https://proyecto-comida-backend.onrender.com'
         : 'http://localhost:3000';
@@ -503,12 +651,8 @@
     let carrito = null;
     let stripe = null;
     let elements = null;
-    let paymentElement = null;
     let paymentIntentClientSecret = null;
 
-    /* =======================================================
-     * UTILIDADES DE MENSAJES (debe ir antes de usarse)
-     * ======================================================= */
     function mostrarMensaje(mensaje, tipo = 'info') {
         const alertDiv = document.createElement('div');
         alertDiv.className = `alert ${tipo}`;
@@ -522,18 +666,12 @@
         container.innerHTML = `<div class="pago-mensaje ${tipo}">${mensaje}</div>`;
     }
 
-    /* =======================================================
-     * GENERAR SESSION ID ÚNICO
-     * ======================================================= */
     function generateSessionId() {
         const id = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         localStorage.setItem('session_id', id);
         return id;
     }
 
-    /* =======================================================
-     * INICIALIZACIÓN
-     * ======================================================= */
     document.addEventListener('DOMContentLoaded', async () => {
         await inicializarStripe();
         await cargarCarrito();
@@ -553,9 +691,6 @@
         }
     }
 
-    /* =======================================================
-     * EVENTOS
-     * ======================================================= */
     function setupEventListeners() {
         document.getElementById('btnProcederPago').addEventListener('click', procesarPago);
         ['nombreCliente', 'emailCliente'].forEach(id => {
@@ -574,9 +709,6 @@
         document.getElementById('btnProcederPago').disabled = !nombre || !email || items === 0;
     }
 
-    /* =======================================================
-     * CARGAR CARRITO
-     * ======================================================= */
     async function cargarCarrito() {
         try {
             const response = await fetch(`${API_BASE}/api/carrito`, {
@@ -607,11 +739,24 @@
             return;
         }
 
-        container.innerHTML = items.map(item => `
+        container.innerHTML = items.map(item => {
+            const precioUnitario = parseFloat(item.precio_unitario || 0);
+            const precioOriginal = parseFloat(item.precio_original || precioUnitario * 1.5);
+            const descuento = item.descuento_porcentaje || Math.round(((precioOriginal - precioUnitario) / precioOriginal) * 100);
+            const subtotal = parseFloat(item.subtotal || 0);
+            
+            return `
             <div class="carrito-item">
                 <div class="item-info">
                     <h4>${item.nombre}</h4>
-                    <span class="item-categoria">${item.categoria || 'Sin categoría'}</span>
+                    <div class="item-empresa">
+                        <i>🏪</i>
+                        <span>${item.empresa || 'Restaurante Local'}</span>
+                    </div>
+                    <div>
+                        <span class="item-categoria">${item.categoria || 'Sin categoría'}</span>
+                        ${descuento > 0 ? `<span class="item-descuento-badge">-${descuento}%</span>` : ''}
+                    </div>
                     <div class="item-controles">
                         <div class="cantidad-control">
                             <button onclick="cambiarCantidad(${item.id}, ${item.cantidad - 1})">−</button>
@@ -622,10 +767,12 @@
                     </div>
                 </div>
                 <div class="item-precio">
-                    <div class="precio-unitario">Bs ${parseFloat(item.precio_unitario || 0).toFixed(2)}</div>
-                    <div class="precio-total">Bs ${parseFloat(item.subtotal || 0).toFixed(2)}</div>
+                    ${descuento > 0 ? `<div class="precio-original">Bs ${precioOriginal.toFixed(2)}</div>` : ''}
+                    <div class="precio-con-descuento">Bs ${precioUnitario.toFixed(2)} c/u</div>
+                    <div class="precio-total">Bs ${subtotal.toFixed(2)}</div>
                 </div>
-            </div>`).join('');
+            </div>`;
+        }).join('');
 
         document.getElementById('cartCount').textContent = items.reduce((sum, i) => sum + i.cantidad, 0);
     }
@@ -634,18 +781,67 @@
         const subtotal = carrito?.resumen?.subtotal || 0;
         const impuestos = carrito?.resumen?.impuestos || 0;
         const total = carrito?.resumen?.total || 0;
+        
+        // Calcular ahorro total
+        let ahorroTotal = 0;
+        if (carrito?.items) {
+            carrito.items.forEach(item => {
+                const precioUnitario = parseFloat(item.precio_unitario || 0);
+                const precioOriginal = parseFloat(item.precio_original || precioUnitario * 1.5);
+                const cantidad = parseInt(item.cantidad || 1);
+                ahorroTotal += (precioOriginal - precioUnitario) * cantidad;
+            });
+        }
+        
         document.getElementById('subtotal').textContent = `Bs ${subtotal.toFixed(2)}`;
+        document.getElementById('ahorro').textContent = `Bs ${ahorroTotal.toFixed(2)}`;
         document.getElementById('impuestos').textContent = `Bs ${impuestos.toFixed(2)}`;
         document.getElementById('total').textContent = `Bs ${total.toFixed(2)}`;
     }
 
-    /* =======================================================
-     * PROCESO DE PAGO
-     * ======================================================= */
+    async function cambiarCantidad(itemId, nuevaCantidad) {
+        if (nuevaCantidad < 1) {
+            return eliminarItem(itemId);
+        }
+        try {
+            const response = await fetch(`${API_BASE}/api/carrito/items/${itemId}`, {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'x-session-id': sessionId 
+                },
+                body: JSON.stringify({ cantidad: nuevaCantidad })
+            });
+            if (!response.ok) throw new Error('Error al actualizar cantidad');
+            await cargarCarrito();
+            mostrarMensaje('Cantidad actualizada', 'success');
+        } catch (error) {
+            console.error('❌ Error:', error);
+            mostrarMensaje('Error al actualizar cantidad', 'error');
+        }
+    }
+
+    async function eliminarItem(itemId) {
+        if (!confirm('¿Eliminar este producto del carrito?')) return;
+        try {
+            const response = await fetch(`${API_BASE}/api/carrito/items/${itemId}`, {
+                method: 'DELETE',
+                headers: { 'x-session-id': sessionId }
+            });
+            if (!response.ok) throw new Error('Error al eliminar item');
+            await cargarCarrito();
+            mostrarMensaje('Producto eliminado del carrito', 'success');
+        } catch (error) {
+            console.error('❌ Error:', error);
+            mostrarMensaje('Error al eliminar producto', 'error');
+        }
+    }
+
     async function procesarPago() {
         const btn = document.getElementById('btnProcederPago');
         btn.disabled = true;
         btn.textContent = 'Procesando...';
+        
         try {
             if (!carrito || !carrito.items?.length) throw new Error('El carrito está vacío');
 
@@ -657,6 +853,8 @@
             const telefono = document.getElementById('telefonoCliente').value.trim();
             const direccion = document.getElementById('direccion').value.trim();
             if (!nombre || !email) throw new Error('Completa los campos obligatorios');
+
+            const metodoPago = document.querySelector('input[name="metodo_pago"]:checked')?.value || 'tarjeta';
 
             console.log('💾 Guardando información del cliente...');
             const infoResponse = await fetch(`${API_BASE}/api/carrito/info`, {
@@ -671,20 +869,27 @@
             });
             if (!infoResponse.ok) throw new Error('Error al guardar información del cliente');
 
-            console.log('💳 Creando PaymentIntent...');
-            const intentResponse = await fetch(`${API_BASE}/api/checkout/create-payment-intent`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'x-session-id': sessionId }
-            });
-            if (!intentResponse.ok) {
-                const err = await intentResponse.json();
-                throw new Error(err.mensaje || 'Error al crear la intención de pago');
-            }
+            // Procesar según método de pago
+            if (metodoPago === 'tarjeta') {
+                console.log('💳 Creando PaymentIntent...');
+                const intentResponse = await fetch(`${API_BASE}/api/checkout/create-payment-intent`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-session-id': sessionId }
+                });
+                if (!intentResponse.ok) {
+                    const err = await intentResponse.json();
+                    throw new Error(err.mensaje || 'Error al crear la intención de pago');
+                }
 
-            const { clientSecret } = await intentResponse.json();
-            paymentIntentClientSecret = clientSecret;
-            console.log('✅ PaymentIntent creado:', clientSecret);
-            await mostrarModalPago(clientSecret);
+                const { clientSecret } = await intentResponse.json();
+                paymentIntentClientSecret = clientSecret;
+                console.log('✅ PaymentIntent creado:', clientSecret);
+                await mostrarModalPago(clientSecret, 'tarjeta');
+            } else if (metodoPago === 'efectivo') {
+                await mostrarModalPago(null, 'efectivo');
+            } else if (metodoPago === 'qr') {
+                await mostrarModalPago(null, 'qr');
+            }
         } catch (error) {
             console.error('❌ Error al procesar pago:', error);
             mostrarMensaje(error.message, 'error');
@@ -694,36 +899,66 @@
         }
     }
 
-    /* =======================================================
-     * MODAL STRIPE (CardElement)
-     * ======================================================= */
-    async function mostrarModalPago(clientSecret) {
+    async function mostrarModalPago(clientSecret, metodo) {
         const modal = document.getElementById('modalPago');
-        const container = document.getElementById('payment-element');
+        const titulo = document.getElementById('modalPagoTitulo');
         const mensaje = document.getElementById('pagoMensaje');
+        const total = parseFloat(carrito.resumen?.total || 0);
+
+        // Ocultar todos los contenidos
+        document.getElementById('payment-form').style.display = 'none';
+        document.getElementById('efectivo-content').style.display = 'none';
+        document.getElementById('qr-content').style.display = 'none';
 
         modal.style.display = 'block';
         mensaje.innerHTML = '';
-        container.innerHTML = '<div style="text-align:center;padding:2rem;color:#666;">Cargando formulario...</div>';
 
-        await new Promise(r => setTimeout(r, 200));
+        if (metodo === 'tarjeta') {
+            titulo.textContent = 'Pagar con Tarjeta';
+            const container = document.getElementById('payment-element');
+            container.innerHTML = '<div style="text-align:center;padding:2rem;color:#666;">Cargando formulario...</div>';
+            document.getElementById('payment-form').style.display = 'block';
 
-        try {
-            if (!stripe) throw new Error('Stripe no inicializado');
-            elements = stripe.elements({ appearance: { theme: 'stripe' } });
-            const cardElement = elements.create('card');
-            container.innerHTML = '';
-            cardElement.mount('#payment-element');
-            console.log('✅ CardElement montado correctamente');
+            await new Promise(r => setTimeout(r, 200));
 
-            const form = document.getElementById('payment-form');
-            form.onsubmit = async (e) => {
-                e.preventDefault();
-                await confirmarPago(cardElement, clientSecret);
+            try {
+                if (!stripe) throw new Error('Stripe no inicializado');
+                elements = stripe.elements({ appearance: { theme: 'stripe' } });
+                const cardElement = elements.create('card');
+                container.innerHTML = '';
+                cardElement.mount('#payment-element');
+                console.log('✅ CardElement montado correctamente');
+
+                const form = document.getElementById('payment-form');
+                form.onsubmit = async (e) => {
+                    e.preventDefault();
+                    await confirmarPago(cardElement, clientSecret);
+                };
+            } catch (error) {
+                console.error('❌ Error al montar CardElement:', error);
+                mensaje.innerHTML = `<div class="pago-mensaje error">${error.message}</div>`;
+            }
+        } else if (metodo === 'efectivo') {
+            titulo.textContent = 'Pago en Efectivo';
+            document.getElementById('efectivo-content').style.display = 'block';
+            document.getElementById('efectivo-monto').textContent = `Bs ${total.toFixed(2)}`;
+            
+            document.getElementById('btnConfirmarEfectivo').onclick = async () => {
+                await confirmarPedidoEfectivo();
             };
-        } catch (error) {
-            console.error('❌ Error al montar CardElement:', error);
-            mensaje.innerHTML = `<div class="pago-mensaje error">${error.message}</div>`;
+        } else if (metodo === 'qr') {
+            titulo.textContent = 'Pago con QR';
+            document.getElementById('qr-content').style.display = 'block';
+            document.getElementById('qr-monto').textContent = `Bs ${total.toFixed(2)}`;
+            
+            // Generar QR
+            const qrData = `Comida Sobrante|Monto: Bs ${total.toFixed(2)}|Pedido: ${sessionId}`;
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrData)}`;
+            document.getElementById('qr-code-img').src = qrUrl;
+            
+            document.getElementById('btnConfirmarQR').onclick = async () => {
+                await confirmarPedidoQR();
+            };
         }
     }
 
@@ -769,6 +1004,56 @@
             submitButton.disabled = false;
             buttonText.style.display = 'inline';
             spinner.style.display = 'none';
+        }
+    }
+
+    async function confirmarPedidoEfectivo() {
+        const btn = document.getElementById('btnConfirmarEfectivo');
+        btn.disabled = true;
+        btn.textContent = 'Confirmando...';
+
+        try {
+            const response = await fetch(`${API_BASE}/api/checkout/confirm-efectivo`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'x-session-id': sessionId }
+            });
+
+            if (!response.ok) throw new Error('Error al confirmar pedido');
+
+            const data = await response.json();
+            mostrarMensajePago('¡Pedido confirmado! Prepara el efectivo para la entrega.', 'exito');
+            localStorage.removeItem('session_id');
+            setTimeout(() => window.location.href = 'pedidos.html', 2000);
+        } catch (error) {
+            console.error('❌ Error:', error);
+            mostrarMensajePago(error.message, 'error');
+            btn.disabled = false;
+            btn.textContent = 'Confirmar Pedido (Pago en Efectivo)';
+        }
+    }
+
+    async function confirmarPedidoQR() {
+        const btn = document.getElementById('btnConfirmarQR');
+        btn.disabled = true;
+        btn.textContent = 'Confirmando...';
+
+        try {
+            const response = await fetch(`${API_BASE}/api/checkout/confirm-qr`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'x-session-id': sessionId }
+            });
+
+            if (!response.ok) throw new Error('Error al confirmar pedido');
+
+            const data = await response.json();
+            mostrarMensajePago('¡Pago registrado! Verificaremos tu transacción.', 'exito');
+            localStorage.removeItem('session_id');
+            setTimeout(() => window.location.href = 'pedidos.html', 2000);
+        } catch (error) {
+            console.error('❌ Error:', error);
+            mostrarMensajePago(error.message, 'error');
+            btn.disabled = false;
+            btn.textContent = 'Ya Realicé el Pago';
         }
     }
 
