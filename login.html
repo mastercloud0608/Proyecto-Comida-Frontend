@@ -9,7 +9,7 @@
 <body class="login-container">
     <div class="login-form">
         <h1>Iniciar Sesión</h1>
-        <p class="text-center" style="color: #666; margin-bottom: 1.5rem;">
+        <p style="text-align: center; color: #666; margin-bottom: 1.5rem;">
             Accede a tu cuenta
         </p>
 
@@ -22,14 +22,14 @@
             
             <button type="submit" id="submitBtn">Iniciar sesión</button>
             
-            <div id="errorMessage" class="alert"></div>
+            <div id="errorMessage" class="alert" style="display: none;"></div>
         </form>
         
-        <p class="text-center" style="margin-top: 20px;">
+        <p style="text-align: center; margin-top: 20px;">
             ¿No tienes cuenta? <a href="register.html">Regístrate aquí</a>
         </p>
         
-        <p class="text-center" style="margin-top: 10px;">
+        <p style="text-align: center; margin-top: 10px;">
             <a href="index.html">Volver al inicio</a>
         </p>
     </div>
@@ -41,7 +41,6 @@
 
         console.log('🔗 API Base URL:', API_BASE);
 
-        // Verificar si ya está logueado
         const isLoggedIn = localStorage.getItem('isLoggedIn');
         const userRol = localStorage.getItem('userRol');
         
@@ -56,7 +55,6 @@
             }
         }
 
-        // Manejar el envío del formulario
         const loginForm = document.getElementById('loginForm');
         const submitBtn = document.getElementById('submitBtn');
         const errorMessage = document.getElementById('errorMessage');
@@ -69,10 +67,8 @@
 
             console.log('📝 Intentando login con:', username);
 
-            // Limpiar mensajes previos
             errorMessage.style.display = 'none';
 
-            // Validaciones
             if (!username || !password) {
                 showError('Por favor, completa todos los campos.');
                 return;
@@ -107,7 +103,6 @@
                     console.log('✅ Login exitoso');
                     showSuccess('Login exitoso. Redirigiendo...');
                     
-                    // Guardar información en localStorage
                     localStorage.setItem('isLoggedIn', 'true');
                     localStorage.setItem('userId', result.usuario.id);
                     localStorage.setItem('username', result.usuario.username);
@@ -119,7 +114,6 @@
                     console.log('💾 Datos guardados en localStorage');
                     console.log('👤 Rol:', result.usuario.rol);
                     
-                    // Redirigir según rol
                     setTimeout(() => {
                         if (result.usuario.rol === 'vendedor') {
                             console.log('↪ Redirigiendo a dashboard vendedor');
@@ -149,7 +143,7 @@
 
         function showError(message) {
             errorMessage.textContent = message;
-            errorMessage.className = 'alert error';
+            errorMessage.className = 'alert';
             errorMessage.style.display = 'block';
         }
 
@@ -159,7 +153,6 @@
             errorMessage.style.display = 'block';
         }
 
-        // Enfocar el primer campo
         window.addEventListener('load', () => {
             document.getElementById('username').focus();
         });
