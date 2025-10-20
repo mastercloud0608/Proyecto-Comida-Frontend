@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Panel - Vendedor</title>
+    <link rel="stylesheet" href="assets/styles.css">
+    <style>
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 2rem;
+            color: #4CAF50;
+            margin: 0.5rem 0;
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .pedidos-pendientes {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .pedido-card {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: #f9f9f9;
+        }
+
+        .pedido-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .pedido-estado {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: bold;
+        }
+
+        .estado-pendiente { background: #fff3cd; color: #856404; }
+        .estado-confirmado { background: #d4edda; color: #155724; }
+        .estado-en-preparacion { background: #d1ecf1; color: #0c5460; }
+        .estado-listo { background: #cce5ff; color: #004085; }
+
+        .pedido-acciones {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: bold;
+        }
+
+        .btn-success { background: #4CAF50; color: white; }
+        .btn-primary { background: #2196F3; color: white; }
+        .btn-danger { background: #f44336; color: white; }
+
+        .btn-sm:hover {
+            opacity: 0.9;
+        }
+
+        .productos-section {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .producto-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .producto-item:last-child {
+            border-bottom: none;
+        }
+
+        .producto-info h4 {
+            margin: 0 0 0.25rem 0;
+        }
+
+        .producto-info p {
+            margin: 0;
+            color: #666;
+            font-size: 0.875rem;
+        }
+
+        .producto-precio {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Comida Sobrante</h1>
+            <p>Panel de Vendedor</p>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="#" onclick="verSeccion('pedidos')">📦 Pedidos</a></li>
+                <li><a href="#" onclick="verSeccion('productos')">🍽️ Mis Productos</a></li>
+                <li><a href="comida.html">➕ Publicar Producto</a></li>
+                <li><a href="#" id="logout-btn">Cerrar sesión</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h2>Bienvenido, <span id="user-name">Vendedor</span></h2>
+            <p>Gestiona tus productos y pedidos</p>
+        </section>
+
+        <section style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
+            <h2>Resumen de Ventas</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📦</div>
+                    <h3 id="pedidos-totales">0</h3>
+                    <p>Pedidos Totales</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⏳</div>
+                    <h3 id="pedidos-pendientes-count">0</h3>
+                    <p>Pedidos Pendientes</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <h3 id="ventas-totales">Bs 0.00</h3>
+                    <p>Ventas Totales</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🍽️</div>
+                    <h3 id="productos-activos">0</h3>
+                    <p>Productos Activos</p>
+                </div>
+            </div>
+
+            <!-- Pedidos Pendientes -->
+            <div class="pedidos-pendientes" id="seccion-pedidos">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2>Pedidos Pendientes de Confirmación</h2>
+                    <button onclick="cargarPedidos()" class="btn-sm btn-primary">🔄 Actualizar</button>
+                </div>
+                <div id="pedidos-lista">
+                    <p style="text-align: center; color: #999;">Cargando pedidos...</p>
+                </div>
+            </div>
+
+            <!-- Mis Productos -->
+            <div class="productos-section" id="seccion-productos">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2>Mis Productos</h2>
+                    <a href="comida.html" class="btn-sm btn-success">➕ Publicar Nuevo</a>
+                </div>
+                <div id="productos-lista">
+                    <p style="text-align: center; color: #999;">Cargando productos...</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Comida Sobrante. Reduciendo el desperdicio alimentario</p>
+    </footer>
+
+    <script>
+        const API_BASE = location.hostname.includes('netlify.app') || location.hostname.includes('github.io')
+            ? 'https://proyecto-comida-backend.onrender.com'
+            : 'http://localhost:3000';
+
+        // Verificar autenticación
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            alert('Debes iniciar sesión para acceder');
+            window.location.replace('login.html');
+        }
+
+        const userRol = localStorage.getItem('userRol');
+        if (userRol !== 'vendedor' && userRol !== 'admin') {
+            alert('Esta área es solo para vendedores');
+            window.location.replace('dashboard-usuario.html');
+        }
+
+        const userId = localStorage.getItem('userId');
+        const userName = localStorage.getItem('userNombre') || localStorage.getItem('username');
+        document.getElementById('user-name').textContent = userName;
+
+        // Cargar datos del vendedor
+        async function cargarDatosVendedor() {
+            try {
+                // Cargar todos los pedidos
+                const response = await fetch(`${API_BASE}/api/pedidos?limit=500`);
+                if (!response.ok) throw new Error('Error al cargar pedidos');
+                
+                const data = await response.json();
+                const todosPedidos = data.pedidos || [];
+                
+                // Filtrar pedidos del vendedor (por vendedor_id o email)
+                const userEmail = localStorage.getItem('userEmail');
+                const misPedidos = todosPedidos.filter(p => 
+                    p.vendedor_id == userId || 
+                    (p.vendedor_email && p.vendedor_email.toLowerCase() === userEmail.toLowerCase())
+                );
+
+                // Calcular estadísticas
+                const pedidosPendientes = misPedidos.filter(p => p.estado === 'pendiente');
+                const ventasTotales = misPedidos
+                    .filter(p => ['confirmado', 'en-preparacion', 'listo', 'entregado'].includes(p.estado))
+                    .reduce((sum, p) => sum + parseFloat(p.precio_total || 0), 0);
+
+                // Actualizar UI
+                document.getElementById('pedidos-totales').textContent = misPedidos.length;
+                document.getElementById('pedidos-pendientes-count').textContent = pedidosPendientes.length;
+                document.getElementById('ventas-totales').textContent = `Bs ${ventasTotales.toFixed(2)}`;
+
+                // Mostrar pedidos pendientes
+                mostrarPedidosPendientes(pedidosPendientes);
+
+            } catch (error) {
+                console.error('Error al cargar datos:', error);
+                document.getElementById('pedidos-lista').innerHTML = 
+                    '<p style="text-align: center; color: #999;">Error al cargar pedidos</p>';
+            }
+
+            // Cargar productos del vendedor
+            await cargarProductos();
+        }
+
+        function mostrarPedidosPendientes(pedidos) {
+            const container = document.getElementById('pedidos-lista');
+            
+            if (pedidos.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #999;">No hay pedidos pendientes</p>';
+                return;
+            }
+
+            container.innerHTML = pedidos.map(pedido => `
+                <div class="pedido-card" id="pedido-${pedido.id}">
+                    <div class="pedido-header">
+                        <div>
+                            <strong>${pedido.nombre_comida}</strong>
+                            <p style="margin: 0.25rem 0 0 0; color: #666; font-size: 0.875rem;">
+                                Cliente: ${pedido.nombre_cliente} | ${pedido.email_cliente}
+                            </p>
+                        </div>
+                        <span class="pedido-estado estado-${pedido.estado}">
+                            ${pedido.estado.toUpperCase()}
+                        </span>
+                    </div>
+                    <div style="color: #666; font-size: 0.875rem; margin-top: 0.5rem;">
+                        <p><strong>Cantidad:</strong> ${pedido.cantidad}</p>
+                        <p><strong>Total:</strong> Bs ${parseFloat(pedido.precio_total).toFixed(2)}</p>
+                        <p><strong>Método de pago:</strong> ${pedido.metodo_pago || 'Efectivo'}</p>
+                        ${pedido.direccion ? `<p><strong>Dirección:</strong> ${pedido.direccion}</p>` : ''}
+                        ${pedido.telefono_cliente ? `<p><strong>Teléfono:</strong> ${pedido.telefono_cliente}</p>` : ''}
+                        ${pedido.notas ? `<p><strong>Notas:</strong> ${pedido.notas}</p>` : ''}
+                        <p><strong>Fecha:</strong> ${new Date(pedido.fecha_pedido).toLocaleString('es-BO')}</p>
+                    </div>
+                    <div class="pedido-acciones">
+                        <button class="btn-sm btn-success" onclick="cambiarEstadoPedido(${pedido.id}, 'confirmado')">
+                            ✅ Confirmar
+                        </button>
+                        <button class="btn-sm btn-primary" onclick="cambiarEstadoPedido(${pedido.id}, 'en-preparacion')">
+                            👨‍🍳 En Preparación
+                        </button>
+                        <button class="btn-sm btn-primary" onclick="cambiarEstadoPedido(${pedido.id}, 'listo')">
+                            ✔️ Listo
+                        </button>
+                        <button class="btn-sm btn-danger" onclick="cambiarEstadoPedido(${pedido.id}, 'cancelado')">
+                            ❌ Cancelar
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function cambiarEstadoPedido(pedidoId, nuevoEstado) {
+            try {
+                const response = await fetch(`${API_BASE}/api/pedidos/${pedidoId}/estado`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ estado: nuevoEstado })
+                });
+
+                if (!response.ok) throw new Error('Error al actualizar estado');
+
+                alert(`Pedido ${nuevoEstado === 'confirmado' ? 'confirmado' : 'actualizado'} exitosamente`);
+                await cargarDatosVendedor();
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al actualizar el pedido');
+            }
+        }
+
+        async function cargarProductos() {
+            try {
+                const response = await fetch(`${API_BASE}/api/comidas?limit=100`);
+                if (!response.ok) throw new Error('Error al cargar productos');
+                
+                const data = await response.json();
+                const todosProductos = data.comidas || data.items || data;
+                
+                // Filtrar productos del vendedor
+                const misProductos = Array.isArray(todosProductos) 
+                    ? todosProductos.filter(p => p.vendedor_id == userId)
+                    : [];
+
+                document.getElementById('productos-activos').textContent = misProductos.length;
+                mostrarProductos(misProductos);
+
+            } catch (error) {
+                console.error('Error al cargar productos:', error);
+                document.getElementById('productos-lista').innerHTML = 
+                    '<p style="text-align: center; color: #999;">Error al cargar productos</p>';
+            }
+        }
+
+        function mostrarProductos(productos) {
+            const container = document.getElementById('productos-lista');
+            
+            if (productos.length === 0) {
+                container.innerHTML = `
+                    <p style="text-align: center; color: #999;">
+                        No has publicado productos aún. 
+                        <a href="comida.html">¡Publica tu primer producto!</a>
+                    </p>`;
+                return;
+            }
+
+            container.innerHTML = productos.map(producto => `
+                <div class="producto-item">
+                    <div class="producto-info">
+                        <h4>${producto.nombre}</h4>
+                        <p>${producto.categoria || 'Sin categoría'} | Stock: ${producto.stock_disponible || 0}</p>
+                        ${producto.empresa ? `<p>🏪 ${producto.empresa}</p>` : ''}
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="producto-precio">Bs ${parseFloat(producto.precio).toFixed(2)}</div>
+                        ${producto.descuento_porcentaje > 0 ? 
+                            `<span style="color: #ff5722; font-size: 0.875rem;">-${producto.descuento_porcentaje}%</span>` 
+                            : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function verSeccion(seccion) {
+            // Scroll a la sección
+            const elemento = document.getElementById(`seccion-${seccion}`);
+            if (elemento) {
+                elemento.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        async function cargarPedidos() {
+            document.getElementById('pedidos-lista').innerHTML = 
+                '<p style="text-align: center; color: #999;">Cargando pedidos...</p>';
+            await cargarDatosVendedor();
+        }
+
+        // Cerrar sesión
+        document.getElementById('logout-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            if (confirm('¿Cerrar sesión?')) {
+                localStorage.clear();
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Cargar datos al iniciar
+        document.addEventListener('DOMContentLoaded', cargarDatosVendedor);
+
+        // Auto-actualizar cada 30 segundos
+        setInterval(cargarDatosVendedor, 30000);
+    </script>
+</body>
+</html>

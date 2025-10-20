@@ -5,52 +5,122 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro - Comida Sobrante</title>
     <link rel="stylesheet" href="assets/styles.css">
+    <style>
+        .rol-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .rol-option {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .rol-option:hover {
+            border-color: #4CAF50;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .rol-option input[type="radio"] {
+            display: none;
+        }
+
+        .rol-option input[type="radio"]:checked + .rol-content {
+            color: #4CAF50;
+        }
+
+        .rol-option input[type="radio"]:checked ~ {
+            border-color: #4CAF50;
+            background: #f1f8f4;
+        }
+
+        .rol-option.selected {
+            border-color: #4CAF50;
+            background: #f1f8f4;
+        }
+
+        .rol-content h3 {
+            margin: 0.5rem 0;
+            font-size: 1.25rem;
+        }
+
+        .rol-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .rol-content p {
+            font-size: 0.875rem;
+            color: #666;
+            margin: 0.5rem 0 0 0;
+        }
+
+        @media (max-width: 600px) {
+            .rol-selector {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body class="login-container">
     <div class="login-form">
         <h1>Crear Cuenta</h1>
-        <form id="registerForm" novalidate>
-            <label for="username">Nombre de usuario:</label>
-            <input 
-                type="text" 
-                id="username" 
-                name="username" 
-                required 
-                minlength="3"
-                maxlength="50"
-                pattern="^[a-zA-Z0-9@._-]+$"
-                aria-describedby="username-help"
-                autocomplete="username">
-            <small id="username-help" style="color: #666; font-size: 0.9em;">
-                Mínimo 3 caracteres. Puedes usar letras, números, @, ., _ y -
-            </small>
-            
+        <p style="text-align: center; color: #666; margin-bottom: 1.5rem;">
+            Únete a nuestra comunidad contra el desperdicio de alimentos
+        </p>
+
+        <form id="registerForm">
+            <!-- Selector de Rol -->
+            <div class="form-group">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">
+                    ¿Cómo deseas usar la plataforma?
+                </label>
+                <div class="rol-selector">
+                    <label class="rol-option selected" for="rol-usuario">
+                        <input type="radio" name="rol" id="rol-usuario" value="usuario" checked>
+                        <div class="rol-content">
+                            <div class="rol-icon">🛒</div>
+                            <h3>Usuario</h3>
+                            <p>Compra comida a precios reducidos</p>
+                        </div>
+                    </label>
+
+                    <label class="rol-option" for="rol-vendedor">
+                        <input type="radio" name="rol" id="rol-vendedor" value="vendedor">
+                        <div class="rol-content">
+                            <div class="rol-icon">🏪</div>
+                            <h3>Vendedor</h3>
+                            <p>Publica y vende productos</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <label for="nombre_completo">Nombre Completo:</label>
+            <input type="text" id="nombre_completo" name="nombre_completo" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="username">Nombre de Usuario:</label>
+            <input type="text" id="username" name="username" required 
+                   pattern="[a-zA-Z0-9._-]{3,50}" 
+                   title="3-50 caracteres: letras, números, punto, guion">
+
             <label for="password">Contraseña:</label>
-            <input 
-                type="password" 
-                id="password" 
-                name="password" 
-                required 
-                minlength="6"
-                aria-describedby="password-help"
-                autocomplete="new-password">
-            <small id="password-help" style="color: #666; font-size: 0.9em;">
-                Mínimo 6 caracteres
-            </small>
-            
-            <label for="confirmPassword">Confirmar contraseña:</label>
-            <input 
-                type="password" 
-                id="confirmPassword" 
-                name="confirmPassword" 
-                required
-                aria-describedby="confirm-help"
-                autocomplete="new-password">
-            <small id="confirm-help" style="color: #666; font-size: 0.9em;">
-                Repite la contraseña anterior
-            </small>
-            
-            <button type="submit" id="submitBtn">Crear cuenta</button>
+            <input type="password" id="password" name="password" required minlength="6">
+
+            <label for="password_confirm">Confirmar Contraseña:</label>
+            <input type="password" id="password_confirm" name="password_confirm" required>
+
+            <button type="submit">Registrarse</button>
             
             <div id="error-message" class="alert" style="display: none;"></div>
         </form>
@@ -65,184 +135,121 @@
     </div>
 
     <script>
-        // === BASE API (prod/local) ===
-        const API_BASE = location.hostname.endsWith('netlify.app')
-          ? 'https://proyecto-comida-backend.onrender.com' // <-- tu backend público
-          : 'http://localhost:3000';
+        const API_BASE = location.hostname.includes('netlify.app') || location.hostname.includes('github.io')
+            ? 'https://proyecto-comida-backend.onrender.com'
+            : 'http://localhost:3000';
 
-        // Variables globales
-        const form = document.getElementById('registerForm');
-        const usernameInput = document.getElementById('username');
-        const passwordInput = document.getElementById('password');
-        const confirmPasswordInput = document.getElementById('confirmPassword');
-        const submitBtn = document.getElementById('submitBtn');
-        const errorMessage = document.getElementById('error-message');
-
-        // Verificar si ya está logueado al cargar la página
-        window.addEventListener('load', () => {
-            if (localStorage.getItem('isLoggedIn') === 'true') {
-                window.location.href = 'dashboard.html';
-                return;
-            }
-            usernameInput.focus();
+        // Manejar selección de rol visual
+        document.querySelectorAll('.rol-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.rol-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                this.classList.add('selected');
+            });
         });
 
-        // Manejar el envío del formulario
-        form.addEventListener('submit', async (e) => {
+        // Manejar envío del formulario
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const username = usernameInput.value.trim();
-            const password = passwordInput.value;
-            const confirmPassword = confirmPasswordInput.value;
+            const nombre_completo = document.getElementById('nombre_completo').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const password_confirm = document.getElementById('password_confirm').value;
+            const rol = document.querySelector('input[name="rol"]:checked').value;
+            const errorMessage = document.getElementById('error-message');
 
-            hideError();
+            // Limpiar mensajes previos
+            errorMessage.style.display = 'none';
 
-            // Validaciones del lado cliente
-            if (!validateForm(username, password, confirmPassword)) return;
+            // Validaciones básicas
+            if (!nombre_completo || !email || !username || !password || !password_confirm) {
+                showError('Por favor, completa todos los campos.');
+                return;
+            }
+
+            if (password !== password_confirm) {
+                showError('Las contraseñas no coinciden.');
+                return;
+            }
+
+            if (password.length < 6) {
+                showError('La contraseña debe tener al menos 6 caracteres.');
+                return;
+            }
+
+            if (username.length < 3 || username.length > 50) {
+                showError('El nombre de usuario debe tener entre 3 y 50 caracteres.');
+                return;
+            }
+
+            if (!/^[a-zA-Z0-9._-]+$/.test(username)) {
+                showError('El nombre de usuario solo puede contener letras, números, punto, guion y guion bajo.');
+                return;
+            }
 
             try {
-                setLoadingState(true);
+                const submitBtn = document.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = 'Registrando...';
+                submitBtn.disabled = true;
 
                 const response = await fetch(`${API_BASE}/auth/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password }),
+                    body: JSON.stringify({
+                        username,
+                        password,
+                        email,
+                        nombre_completo,
+                        rol
+                    }),
                 });
 
                 const result = await response.json().catch(() => ({}));
 
                 if (response.ok) {
-                    showSuccess('¡Usuario registrado con éxito! Redirigiendo al login...');
-                    form.reset();
-                    setTimeout(() => { window.location.href = 'login.html'; }, 1500);
+                    showSuccess('¡Registro exitoso! Redirigiendo al login...');
+                    
+                    // Redirigir al login después de 2 segundos
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
                 } else {
-                    handleServerError(response.status, result.mensaje || '');
+                    showError(result.mensaje || 'Error al registrar usuario');
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
                 }
 
             } catch (error) {
                 console.error('Error de conexión:', error);
-                showError('Error de conexión. Verifica tu conexión a internet e intenta de nuevo.');
-            } finally {
-                setLoadingState(false);
+                showError('Error de conexión. Verifica tu internet e intenta de nuevo.');
+                
+                const submitBtn = document.querySelector('button[type="submit"]');
+                submitBtn.textContent = 'Registrarse';
+                submitBtn.disabled = false;
             }
         });
 
-        // Validaciones del formulario
-        function validateForm(username, password, confirmPassword) {
-            if (!username || !password || !confirmPassword) {
-                showError('Por favor, completa todos los campos.');
-                return false;
-            }
-            if (username.length < 3) {
-                showError('El nombre de usuario debe tener al menos 3 caracteres.');
-                usernameInput.focus(); return false;
-            }
-            if (username.length > 50) {
-                showError('El nombre de usuario no puede tener más de 50 caracteres.');
-                usernameInput.focus(); return false;
-            }
-            const usernameRegex = /^[a-zA-Z0-9@._-]+$/;
-            if (!usernameRegex.test(username)) {
-                showError('El nombre de usuario solo puede contener letras, números y los caracteres @ . _ -');
-                usernameInput.focus(); return false;
-            }
-            if (password.length < 6) {
-                showError('La contraseña debe tener al menos 6 caracteres.');
-                passwordInput.focus(); return false;
-            }
-            if (password !== confirmPassword) {
-                showError('Las contraseñas no coinciden.');
-                confirmPasswordInput.focus(); return false;
-            }
-            return true;
-        }
-
-        // Manejar errores del servidor
-        function handleServerError(status, message) {
-            switch (status) {
-                case 400:
-                    if ((message || '').toLowerCase().includes('ya está')) {
-                        showError('Este nombre de usuario ya está en uso. Elige otro.');
-                        usernameInput.focus();
-                    } else {
-                        showError(message || 'Datos inválidos. Verifica la información.');
-                    }
-                    break;
-                case 409:
-                    showError('Este nombre de usuario ya existe. Prueba con otro.');
-                    break;
-                case 500:
-                    showError('Error interno del servidor. Intenta más tarde.');
-                    break;
-                default:
-                    showError(message || 'Error inesperado. Intenta de nuevo.');
-            }
-        }
-
-        // Validación en tiempo real de confirmación de contraseña
-        confirmPasswordInput.addEventListener('input', function() {
-            const password = passwordInput.value;
-            const confirmPassword = this.value;
-            if (confirmPassword && password !== confirmPassword) {
-                this.setCustomValidity('Las contraseñas no coinciden');
-                this.style.borderColor = '#d32f2f';
-            } else {
-                this.setCustomValidity('');
-                this.style.borderColor = '#ccc';
-            }
-        });
-
-        // Validación en tiempo real del username
-        usernameInput.addEventListener('input', function() {
-            const username = this.value.trim();
-            const usernameRegex = /^[a-zA-Z0-9@._-]*$/;
-            if (username && !usernameRegex.test(username)) {
-                this.setCustomValidity('Solo se permiten letras, números y @ . _ -');
-                this.style.borderColor = '#d32f2f';
-            } else {
-                this.setCustomValidity('');
-                this.style.borderColor = '#ccc';
-            }
-        });
-
-        // Utilidades UI
-        function setLoadingState(isLoading) {
-            submitBtn.textContent = isLoading ? 'Creando cuenta...' : 'Crear cuenta';
-            submitBtn.disabled = isLoading;
-            submitBtn.style.opacity = isLoading ? '0.7' : '1';
-        }
         function showError(message) {
+            const errorMessage = document.getElementById('error-message');
             errorMessage.textContent = message;
             errorMessage.className = 'alert';
             errorMessage.style.display = 'block';
-            setTimeout(() => { if (errorMessage.className === 'alert') hideError(); }, 5000);
         }
+
         function showSuccess(message) {
+            const errorMessage = document.getElementById('error-message');
             errorMessage.textContent = message;
             errorMessage.className = 'alert success';
             errorMessage.style.display = 'block';
         }
-        function hideError() { errorMessage.style.display = 'none'; }
 
-        // UX extra: Enter para avanzar entre inputs y enviar al final
-        form.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
-                e.preventDefault();
-                if (e.target === confirmPasswordInput) {
-                    form.dispatchEvent(new Event('submit'));
-                } else {
-                    const inputs = Array.from(form.querySelectorAll('input'));
-                    const currentIndex = inputs.indexOf(e.target);
-                    if (currentIndex < inputs.length - 1) inputs[currentIndex + 1].focus();
-                }
-            }
-        });
-
-        // Limpiar estilos de error al escribir
-        [usernameInput, passwordInput, confirmPasswordInput].forEach(input => {
-            input.addEventListener('input', () => {
-                if (input.style.borderColor === 'rgb(211, 47, 47)') input.style.borderColor = '#ccc';
-            });
+        // Enfocar el primer campo al cargar
+        window.addEventListener('load', () => {
+            document.getElementById('nombre_completo').focus();
         });
     </script>
 </body>

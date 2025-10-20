@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Panel - Usuario</title>
+    <link rel="stylesheet" href="assets/styles.css">
+    <style>
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 2rem;
+            color: #4CAF50;
+            margin: 0.5rem 0;
+        }
+
+        .stat-card p {
+            color: #666;
+            margin: 0;
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .pedidos-recientes {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .pedido-item {
+            border-bottom: 1px solid #eee;
+            padding: 1rem 0;
+        }
+
+        .pedido-item:last-child {
+            border-bottom: none;
+        }
+
+        .pedido-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .pedido-estado {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: bold;
+        }
+
+        .estado-pendiente { background: #fff3cd; color: #856404; }
+        .estado-confirmado { background: #d4edda; color: #155724; }
+        .estado-en-preparacion { background: #d1ecf1; color: #0c5460; }
+        .estado-listo { background: #cce5ff; color: #004085; }
+        .estado-entregado { background: #d4edda; color: #155724; }
+        .estado-cancelado { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Comida Sobrante</h1>
+            <p>Mi Panel de Usuario</p>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="comida.html">🍽️ Explorar Comidas</a></li>
+                <li><a href="carrito.html">🛒 Carrito</a></li>
+                <li><a href="pedidos.html">📦 Mis Pedidos</a></li>
+                <li><a href="#" id="logout-btn">Cerrar sesión</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h2>Bienvenido, <span id="user-name">Usuario</span></h2>
+            <p>Compra comida a precios reducidos y ayuda a reducir el desperdicio</p>
+        </section>
+
+        <section style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
+            <h2>Resumen de tu Actividad</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📦</div>
+                    <h3 id="total-pedidos">0</h3>
+                    <p>Pedidos Realizados</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <h3 id="total-gastado">Bs 0.00</h3>
+                    <p>Total Gastado</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🌱</div>
+                    <h3 id="impacto-ambiental">0 kg</h3>
+                    <p>Desperdicio Evitado</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🎉</div>
+                    <h3 id="ahorro-total">Bs 0.00</h3>
+                    <p>Ahorro Total</p>
+                </div>
+            </div>
+
+            <div class="pedidos-recientes">
+                <h2>Tus Pedidos Recientes</h2>
+                <div id="pedidos-lista">
+                    <p style="text-align: center; color: #999;">Cargando pedidos...</p>
+                </div>
+            </div>
+
+            <div class="benefits">
+                <h2>Acciones Rápidas</h2>
+                <div class="benefits-container">
+                    <div class="benefit">
+                        <h3>🍽️ Explorar Comidas</h3>
+                        <p>Descubre productos disponibles a precios reducidos</p>
+                        <a href="comida.html" class="btn" style="margin-top: 1rem;">Ver Comidas</a>
+                    </div>
+                    <div class="benefit">
+                        <h3>🛒 Ver Carrito</h3>
+                        <p>Revisa los productos en tu carrito de compras</p>
+                        <a href="carrito.html" class="btn" style="margin-top: 1rem;">Ir al Carrito</a>
+                    </div>
+                    <div class="benefit">
+                        <h3>📦 Mis Pedidos</h3>
+                        <p>Consulta el historial completo de tus pedidos</p>
+                        <a href="pedidos.html" class="btn" style="margin-top: 1rem;">Ver Todos</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Comida Sobrante. Reduciendo el desperdicio alimentario</p>
+    </footer>
+
+    <script>
+        const API_BASE = location.hostname.includes('netlify.app') || location.hostname.includes('github.io')
+            ? 'https://proyecto-comida-backend.onrender.com'
+            : 'http://localhost:3000';
+
+        // Verificar autenticación
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            alert('Debes iniciar sesión para acceder');
+            window.location.replace('login.html');
+        }
+
+        const userRol = localStorage.getItem('userRol');
+        if (userRol === 'vendedor') {
+            window.location.replace('dashboard-vendedor.html');
+        }
+
+        // Mostrar nombre del usuario
+        const userName = localStorage.getItem('userNombre') || localStorage.getItem('username');
+        document.getElementById('user-name').textContent = userName;
+
+        // Cargar datos del usuario
+        async function cargarDatosUsuario() {
+            try {
+                const userEmail = localStorage.getItem('userEmail');
+                
+                // Obtener pedidos del usuario
+                const response = await fetch(`${API_BASE}/api/pedidos?email=${encodeURIComponent(userEmail)}&limit=100`);
+                if (!response.ok) throw new Error('Error al cargar pedidos');
+                
+                const data = await response.json();
+                const pedidos = data.pedidos || [];
+
+                // Calcular estadísticas
+                const totalPedidos = pedidos.length;
+                const totalGastado = pedidos.reduce((sum, p) => sum + parseFloat(p.precio_total || 0), 0);
+                const impactoAmbiental = totalPedidos * 2.5; // 2.5 kg por pedido
+                const ahorroEstimado = totalGastado * 0.4; // Estimado 40% de ahorro
+
+                // Actualizar UI
+                document.getElementById('total-pedidos').textContent = totalPedidos;
+                document.getElementById('total-gastado').textContent = `Bs ${totalGastado.toFixed(2)}`;
+                document.getElementById('impacto-ambiental').textContent = `${impactoAmbiental.toFixed(1)} kg`;
+                document.getElementById('ahorro-total').textContent = `Bs ${ahorroEstimado.toFixed(2)}`;
+
+                // Mostrar pedidos recientes (últimos 5)
+                mostrarPedidosRecientes(pedidos.slice(0, 5));
+
+            } catch (error) {
+                console.error('Error al cargar datos:', error);
+                document.getElementById('pedidos-lista').innerHTML = 
+                    '<p style="text-align: center; color: #999;">Error al cargar pedidos</p>';
+            }
+        }
+
+        function mostrarPedidosRecientes(pedidos) {
+            const container = document.getElementById('pedidos-lista');
+            
+            if (pedidos.length === 0) {
+                container.innerHTML = `
+                    <p style="text-align: center; color: #999;">
+                        No has realizado pedidos aún. 
+                        <a href="comida.html">¡Explora nuestras ofertas!</a>
+                    </p>`;
+                return;
+            }
+
+            container.innerHTML = pedidos.map(pedido => `
+                <div class="pedido-item">
+                    <div class="pedido-header">
+                        <div>
+                            <strong>${pedido.nombre_comida}</strong>
+                            ${pedido.empresa ? `<span style="color: #666; font-size: 0.875rem;"> - ${pedido.empresa}</span>` : ''}
+                        </div>
+                        <span class="pedido-estado estado-${pedido.estado.replace('_', '-')}">
+                            ${pedido.estado.toUpperCase()}
+                        </span>
+                    </div>
+                    <div style="color: #666; font-size: 0.875rem;">
+                        <span>Cantidad: ${pedido.cantidad}</span> | 
+                        <span>Total: Bs ${parseFloat(pedido.precio_total).toFixed(2)}</span> | 
+                        <span>${new Date(pedido.fecha_pedido).toLocaleDateString('es-BO')}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Cerrar sesión
+        document.getElementById('logout-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            if (confirm('¿Cerrar sesión?')) {
+                localStorage.clear();
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Cargar datos al iniciar
+        document.addEventListener('DOMContentLoaded', cargarDatosUsuario);
+    </script>
+</body>
+</html>

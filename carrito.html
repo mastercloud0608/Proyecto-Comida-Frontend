@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carrito de Compras - Comida Sobrante</title>
-    <script src="https://js.stripe.com/v3/"></script>
     <link rel="stylesheet" href="assets/styles.css">
     <style>
         .carrito-container {
@@ -274,6 +273,17 @@
             font-size: 1rem;
         }
 
+        .payment-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: #ffa726;
+            color: white;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 0.5rem;
+        }
+
         .btn-proceder-pago {
             width: 100%;
             padding: 1rem;
@@ -323,7 +333,6 @@
             background: #45a049;
         }
 
-        /* Modal de pago */
         .modal-pago {
             display: none;
             position: fixed;
@@ -344,31 +353,6 @@
             border-radius: 8px;
             max-height: 85vh;
             overflow-y: auto;
-        }
-
-        #payment-element {
-            margin: 1.5rem 0;
-        }
-
-        .btn-pagar {
-            width: 100%;
-            padding: 1rem;
-            background: #6772e5;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 1.125rem;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .btn-pagar:hover:not(:disabled) {
-            background: #5469d4;
-        }
-
-        .btn-pagar:disabled {
-            background: #ccc;
-            cursor: not-allowed;
         }
 
         .pago-mensaje {
@@ -450,8 +434,8 @@
         }
 
         .payment-instructions {
-            background: #e3f2fd;
-            border-left: 4px solid #2196F3;
+            background: #fff3cd;
+            border-left: 4px solid #ffa726;
             padding: 1rem;
             margin: 1rem 0;
             border-radius: 4px;
@@ -459,7 +443,7 @@
 
         .payment-instructions h4 {
             margin: 0 0 0.5rem 0;
-            color: #1976d2;
+            color: #f57c00;
         }
 
         .payment-instructions ol {
@@ -470,10 +454,43 @@
         .payment-instructions li {
             margin: 0.25rem 0;
         }
+
+        .btn-pagar {
+            width: 100%;
+            padding: 1rem;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1.125rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-pagar:hover:not(:disabled) {
+            background: #45a049;
+        }
+
+        .btn-pagar:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .simulacion-notice {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .simulacion-notice h4 {
+            margin: 0 0 0.5rem 0;
+            color: #1976d2;
+        }
     </style>
 </head>
 <body>
-    <!-- Header -->
     <header>
         <div class="logo">
             <h1>Comida Sobrante</h1>
@@ -489,15 +506,12 @@
         </nav>
     </header>
 
-    <!-- Hero Section -->
     <section class="hero">
         <h2>Mi Carrito de Compras</h2>
-        <p>Revisa tu pedido y procede al pago</p>
+        <p>Revisa tu pedido y procede al pago (Modo Simulado)</p>
     </section>
 
-    <!-- Carrito Container -->
     <div class="carrito-container">
-        <!-- Items del carrito -->
         <div class="carrito-items">
             <h3>Productos en tu carrito</h3>
             <div id="carritoItemsContainer">
@@ -505,7 +519,6 @@
             </div>
         </div>
 
-        <!-- Sidebar Resumen -->
         <div class="carrito-sidebar">
             <div class="resumen-pedido">
                 <h3>Resumen del Pedido</h3>
@@ -527,7 +540,6 @@
                     <span id="total">Bs 0.00</span>
                 </div>
 
-                <!-- Formulario de información del cliente -->
                 <div class="formulario-cliente">
                     <h4>Información de Contacto</h4>
                     <form id="formCliente">
@@ -549,19 +561,19 @@
                         </div>
                         
                         <div class="form-group">
-                            <label>Método de Pago *</label>
+                            <label>Método de Pago (Simulado) *</label>
                             <div class="payment-methods">
                                 <label class="payment-option">
                                     <input type="radio" name="metodo_pago" value="tarjeta" checked>
-                                    <span>💳 Tarjeta de Crédito/Débito</span>
+                                    <span>💳 Tarjeta de Crédito/Débito <span class="payment-badge">SIMULADO</span></span>
                                 </label>
                                 <label class="payment-option">
                                     <input type="radio" name="metodo_pago" value="efectivo">
-                                    <span>💵 Efectivo</span>
+                                    <span>💵 Efectivo <span class="payment-badge">SIMULADO</span></span>
                                 </label>
                                 <label class="payment-option">
                                     <input type="radio" name="metodo_pago" value="qr">
-                                    <span>📱 Pago QR</span>
+                                    <span>📱 Pago QR <span class="payment-badge">SIMULADO</span></span>
                                 </label>
                             </div>
                         </div>
@@ -569,64 +581,65 @@
                 </div>
 
                 <button class="btn-proceder-pago" id="btnProcederPago" disabled>
-                    Proceder al Pago
+                    Proceder al Pago (Simulado)
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Modal de Pago -->
     <div id="modalPago" class="modal-pago">
         <div class="modal-pago-content">
-            <h3 id="modalPagoTitulo">Completar Pago</h3>
+            <h3 id="modalPagoTitulo">Procesando Pago Simulado</h3>
             <div id="pagoMensaje"></div>
             
-            <!-- Contenido dinámico según método de pago -->
             <div id="modalPagoContenido">
-                <!-- Para tarjeta: formulario Stripe -->
-                <form id="payment-form" style="display:none;">
-                    <div id="payment-element"></div>
-                    <button id="btnPagar" class="btn-pagar" type="submit">
-                        <span id="button-text">Pagar Ahora</span>
-                        <span id="spinner" style="display:none;">Procesando...</span>
-                    </button>
-                </form>
-                
-                <!-- Para efectivo -->
-                <div id="efectivo-content" style="display:none;">
-                    <div class="payment-instructions">
-                        <h4>📝 Instrucciones para Pago en Efectivo</h4>
-                        <ol>
-                            <li>Confirma tu pedido haciendo clic en el botón de abajo</li>
-                            <li>Tu pedido quedará reservado por 24 horas</li>
-                            <li>Realiza el pago al momento de recibir tu pedido</li>
-                            <li>Trae el monto exacto: <strong id="efectivo-monto">Bs 0.00</strong></li>
-                        </ol>
+                <div id="tarjeta-content" style="display:none;">
+                    <div class="simulacion-notice">
+                        <h4>🔄 Modo Simulación - Pago con Tarjeta</h4>
+                        <p>Este es un pago simulado. Al confirmar, tu pedido será procesado automáticamente sin cargo real.</p>
                     </div>
-                    <button id="btnConfirmarEfectivo" class="btn-pagar">
-                        Confirmar Pedido (Pago en Efectivo)
+                    <div class="payment-instructions">
+                        <h4>✨ Proceso Automático</h4>
+                        <p><strong>Monto a simular:</strong> <span id="tarjeta-monto">Bs 0.00</span></p>
+                        <p>El sistema confirmará tu pedido instantáneamente.</p>
+                    </div>
+                    <button id="btnConfirmarTarjeta" class="btn-pagar">
+                        Confirmar Pago Simulado
                     </button>
                 </div>
                 
-                <!-- Para QR -->
-                <div id="qr-content" style="display:none;">
+                <div id="efectivo-content" style="display:none;">
+                    <div class="simulacion-notice">
+                        <h4>🔄 Modo Simulación - Pago en Efectivo</h4>
+                        <p>Este es un pago simulado. Tu pedido será confirmado automáticamente.</p>
+                    </div>
                     <div class="payment-instructions">
-                        <h4>📱 Instrucciones para Pago QR</h4>
-                        <ol>
-                            <li>Escanea el código QR con tu app bancaria</li>
-                            <li>Verifica el monto: <strong id="qr-monto">Bs 0.00</strong></li>
-                            <li>Completa el pago en tu banco</li>
-                            <li>Haz clic en "Confirmar Pago" una vez realizado</li>
-                        </ol>
+                        <h4>✨ Proceso Automático</h4>
+                        <p><strong>Monto simulado:</strong> <span id="efectivo-monto">Bs 0.00</span></p>
+                        <p>En un escenario real, pagarías en efectivo al recibir tu pedido.</p>
+                    </div>
+                    <button id="btnConfirmarEfectivo" class="btn-pagar">
+                        Confirmar Pedido (Simulado)
+                    </button>
+                </div>
+                
+                <div id="qr-content" style="display:none;">
+                    <div class="simulacion-notice">
+                        <h4>🔄 Modo Simulación - Pago QR</h4>
+                        <p>Este es un pago simulado. El código QR es de ejemplo y tu pedido se confirmará automáticamente.</p>
+                    </div>
+                    <div class="payment-instructions">
+                        <h4>✨ Proceso Automático</h4>
+                        <p><strong>Monto simulado:</strong> <span id="qr-monto">Bs 0.00</span></p>
                     </div>
                     <div class="qr-code-container">
-                        <img id="qr-code-img" src="" alt="Código QR para pago">
-                        <p><strong>Cuenta:</strong> 1234567890</p>
-                        <p><strong>Banco:</strong> Banco Nacional</p>
+                        <img id="qr-code-img" src="" alt="Código QR simulado">
+                        <p><strong>Cuenta:</strong> 1234567890 (Ejemplo)</p>
+                        <p><strong>Banco:</strong> Banco Nacional (Simulado)</p>
                         <p><strong>Nombre:</strong> Comida Sobrante</p>
                     </div>
                     <button id="btnConfirmarQR" class="btn-pagar">
-                        Ya Realicé el Pago
+                        Confirmar Pago Simulado
                     </button>
                 </div>
             </div>
@@ -637,7 +650,6 @@
         </div>
     </div>
 
-    <!-- Footer -->
     <footer>
         <p>&copy; 2025 Comida Sobrante. Proyecto de Responsabilidad Social</p>
     </footer>
@@ -649,9 +661,6 @@
 
     let sessionId = localStorage.getItem('session_id') || generateSessionId();
     let carrito = null;
-    let stripe = null;
-    let elements = null;
-    let paymentIntentClientSecret = null;
 
     function mostrarMensaje(mensaje, tipo = 'info') {
         const alertDiv = document.createElement('div');
@@ -673,23 +682,9 @@
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
-        await inicializarStripe();
         await cargarCarrito();
         setupEventListeners();
     });
-
-    async function inicializarStripe() {
-        try {
-            const response = await fetch(`${API_BASE}/api/checkout/config`);
-            if (!response.ok) throw new Error('No se pudo obtener configuración de Stripe');
-            const { publishableKey } = await response.json();
-            stripe = Stripe(publishableKey);
-            console.log('✅ Stripe inicializado correctamente');
-        } catch (error) {
-            console.error('❌ Error al inicializar Stripe:', error);
-            mostrarMensaje('Error al inicializar sistema de pagos', 'error');
-        }
-    }
 
     function setupEventListeners() {
         document.getElementById('btnProcederPago').addEventListener('click', procesarPago);
@@ -782,7 +777,6 @@
         const impuestos = carrito?.resumen?.impuestos || 0;
         const total = carrito?.resumen?.total || 0;
         
-        // Calcular ahorro total
         let ahorroTotal = 0;
         if (carrito?.items) {
             carrito.items.forEach(item => {
@@ -869,26 +863,23 @@
             });
             if (!infoResponse.ok) throw new Error('Error al guardar información del cliente');
 
-            // MODO SIMULADO - Mostrar modal directamente
-            await mostrarModalPago(null, metodoPago);
+            await mostrarModalPago(metodoPago, total);
             
         } catch (error) {
             console.error('❌ Error al procesar pago:', error);
             mostrarMensaje(error.message, 'error');
         } finally {
             btn.disabled = false;
-            btn.textContent = 'Proceder al Pago';
+            btn.textContent = 'Proceder al Pago (Simulado)';
         }
     }
 
-    async function mostrarModalPago(clientSecret, metodo) {
+    async function mostrarModalPago(metodo, total) {
         const modal = document.getElementById('modalPago');
         const titulo = document.getElementById('modalPagoTitulo');
         const mensaje = document.getElementById('pagoMensaje');
-        const total = parseFloat(carrito.resumen?.total || 0);
 
-        // Ocultar todos los contenidos
-        document.getElementById('payment-form').style.display = 'none';
+        document.getElementById('tarjeta-content').style.display = 'none';
         document.getElementById('efectivo-content').style.display = 'none';
         document.getElementById('qr-content').style.display = 'none';
 
@@ -896,146 +887,78 @@
         mensaje.innerHTML = '';
 
         if (metodo === 'tarjeta') {
-            titulo.textContent = 'Pagar con Tarjeta';
-            const container = document.getElementById('payment-element');
-            container.innerHTML = '<div style="text-align:center;padding:2rem;color:#666;">Cargando formulario...</div>';
-            document.getElementById('payment-form').style.display = 'block';
-
-            await new Promise(r => setTimeout(r, 200));
-
-            try {
-                if (!stripe) throw new Error('Stripe no inicializado');
-                elements = stripe.elements({ appearance: { theme: 'stripe' } });
-                const cardElement = elements.create('card');
-                container.innerHTML = '';
-                cardElement.mount('#payment-element');
-                console.log('✅ CardElement montado correctamente');
-
-                const form = document.getElementById('payment-form');
-                form.onsubmit = async (e) => {
-                    e.preventDefault();
-                    await confirmarPago(cardElement, clientSecret);
-                };
-            } catch (error) {
-                console.error('❌ Error al montar CardElement:', error);
-                mensaje.innerHTML = `<div class="pago-mensaje error">${error.message}</div>`;
-            }
+            titulo.textContent = 'Pago Simulado con Tarjeta';
+            document.getElementById('tarjeta-content').style.display = 'block';
+            document.getElementById('tarjeta-monto').textContent = `Bs ${total.toFixed(2)}`;
+            
+            document.getElementById('btnConfirmarTarjeta').onclick = async () => {
+                await confirmarPagoSimulado(metodo);
+            };
         } else if (metodo === 'efectivo') {
-            titulo.textContent = 'Pago en Efectivo';
+            titulo.textContent = 'Pago Simulado en Efectivo';
             document.getElementById('efectivo-content').style.display = 'block';
             document.getElementById('efectivo-monto').textContent = `Bs ${total.toFixed(2)}`;
             
             document.getElementById('btnConfirmarEfectivo').onclick = async () => {
-                await confirmarPedidoEfectivo();
+                await confirmarPagoSimulado(metodo);
             };
         } else if (metodo === 'qr') {
-            titulo.textContent = 'Pago con QR';
+            titulo.textContent = 'Pago Simulado con QR';
             document.getElementById('qr-content').style.display = 'block';
             document.getElementById('qr-monto').textContent = `Bs ${total.toFixed(2)}`;
             
-            // Generar QR
-            const qrData = `Comida Sobrante|Monto: Bs ${total.toFixed(2)}|Pedido: ${sessionId}`;
+            const qrData = `SIMULADO - Comida Sobrante|Monto: Bs ${total.toFixed(2)}|Pedido: ${sessionId}`;
             const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrData)}`;
             document.getElementById('qr-code-img').src = qrUrl;
             
             document.getElementById('btnConfirmarQR').onclick = async () => {
-                await confirmarPedidoQR();
+                await confirmarPagoSimulado(metodo);
             };
         }
     }
 
-    async function confirmarPago(cardElement, clientSecret) {
-        const submitButton = document.getElementById('btnPagar');
-        const buttonText = document.getElementById('button-text');
-        const spinner = document.getElementById('spinner');
-        submitButton.disabled = true;
-        buttonText.style.display = 'none';
-        spinner.style.display = 'inline';
+    async function confirmarPagoSimulado(metodoPago) {
+        const btnId = metodoPago === 'tarjeta' ? 'btnConfirmarTarjeta' : 
+                     metodoPago === 'efectivo' ? 'btnConfirmarEfectivo' : 'btnConfirmarQR';
+        const btn = document.getElementById(btnId);
+        const textoOriginal = btn.textContent;
+        
+        btn.disabled = true;
+        btn.textContent = '⏳ Procesando pago simulado...';
 
         try {
-            console.log('🚀 Enviando confirmación a Stripe...');
-            const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-                payment_method: {
-                    card: cardElement,
-                    billing_details: {
-                        name: document.getElementById('nombreCliente').value.trim(),
-                        email: document.getElementById('emailCliente').value.trim()
-                    }
-                }
+            console.log('🔄 Confirmando pago simulado con método:', metodoPago);
+            
+            const response = await fetch(`${API_BASE}/api/pedidos/crear-desde-carrito`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'x-session-id': sessionId 
+                },
+                body: JSON.stringify({ metodo_pago: metodoPago })
             });
-            if (error) throw new Error(error.message);
 
-            if (paymentIntent?.status === 'succeeded') {
-                console.log('✅ Pago exitoso:', paymentIntent.id);
-                const confirmResponse = await fetch(`${API_BASE}/api/checkout/confirm`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'x-session-id': sessionId },
-                    body: JSON.stringify({ paymentIntentId: paymentIntent.id })
-                });
-                if (!confirmResponse.ok) throw new Error('Error al confirmar pedido en servidor');
-                mostrarMensajePago('¡Pago exitoso! Redirigiendo...', 'exito');
-                localStorage.removeItem('session_id');
-                setTimeout(() => window.location.href = 'pedidos.html', 2000);
-            } else {
-                mostrarMensajePago(`Pago no completado (estado: ${paymentIntent?.status})`, 'error');
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.mensaje || 'Error al confirmar pedido');
             }
-        } catch (error) {
-            console.error('❌ Error al confirmar pago:', error);
-            mostrarMensajePago(error.message || 'Error al procesar el pago', 'error');
-        } finally {
-            submitButton.disabled = false;
-            buttonText.style.display = 'inline';
-            spinner.style.display = 'none';
-        }
-    }
-
-    async function confirmarPedidoEfectivo() {
-        const btn = document.getElementById('btnConfirmarEfectivo');
-        btn.disabled = true;
-        btn.textContent = 'Confirmando...';
-
-        try {
-            const response = await fetch(`${API_BASE}/api/checkout/confirm-efectivo`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'x-session-id': sessionId }
-            });
-
-            if (!response.ok) throw new Error('Error al confirmar pedido');
 
             const data = await response.json();
-            mostrarMensajePago('¡Pedido confirmado! Prepara el efectivo para la entrega.', 'exito');
+            console.log('✅ Respuesta del servidor:', data);
+
+            mostrarMensajePago('¡Pago simulado exitoso! ✅ Redirigiendo a tus pedidos...', 'exito');
+            
             localStorage.removeItem('session_id');
-            setTimeout(() => window.location.href = 'pedidos.html', 2000);
+            
+            setTimeout(() => {
+                window.location.href = 'pedidos.html';
+            }, 2000);
+
         } catch (error) {
-            console.error('❌ Error:', error);
-            mostrarMensajePago(error.message, 'error');
+            console.error('❌ Error al confirmar pago simulado:', error);
+            mostrarMensajePago(`Error: ${error.message}`, 'error');
             btn.disabled = false;
-            btn.textContent = 'Confirmar Pedido (Pago en Efectivo)';
-        }
-    }
-
-    async function confirmarPedidoQR() {
-        const btn = document.getElementById('btnConfirmarQR');
-        btn.disabled = true;
-        btn.textContent = 'Confirmando...';
-
-        try {
-            const response = await fetch(`${API_BASE}/api/checkout/confirm-qr`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'x-session-id': sessionId }
-            });
-
-            if (!response.ok) throw new Error('Error al confirmar pedido');
-
-            const data = await response.json();
-            mostrarMensajePago('¡Pago registrado! Verificaremos tu transacción.', 'exito');
-            localStorage.removeItem('session_id');
-            setTimeout(() => window.location.href = 'pedidos.html', 2000);
-        } catch (error) {
-            console.error('❌ Error:', error);
-            mostrarMensajePago(error.message, 'error');
-            btn.disabled = false;
-            btn.textContent = 'Ya Realicé el Pago';
+            btn.textContent = textoOriginal;
         }
     }
 
