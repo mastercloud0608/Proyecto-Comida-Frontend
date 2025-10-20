@@ -14,20 +14,15 @@
             grid-template-columns: 1fr 400px;
             gap: 2rem;
         }
-
         @media (max-width: 768px) {
-            .carrito-container {
-                grid-template-columns: 1fr;
-            }
+            .carrito-container { grid-template-columns: 1fr; }
         }
-
         .carrito-items {
             background: white;
             border-radius: 8px;
             padding: 1.5rem;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-
         .carrito-item {
             display: flex;
             gap: 1rem;
@@ -35,20 +30,9 @@
             border-bottom: 1px solid #eee;
             align-items: center;
         }
-
-        .carrito-item:last-child {
-            border-bottom: none;
-        }
-
-        .item-info {
-            flex: 1;
-        }
-
-        .item-info h4 {
-            margin: 0 0 0.25rem 0;
-            color: #333;
-        }
-
+        .carrito-item:last-child { border-bottom: none; }
+        .item-info { flex: 1; }
+        .item-info h4 { margin: 0 0 0.25rem 0; color: #333; }
         .item-empresa {
             display: flex;
             align-items: center;
@@ -57,11 +41,6 @@
             color: #666;
             margin-bottom: 0.5rem;
         }
-
-        .item-empresa i {
-            font-style: normal;
-        }
-
         .item-categoria {
             display: inline-block;
             padding: 0.25rem 0.5rem;
@@ -71,7 +50,6 @@
             font-size: 0.75rem;
             margin-bottom: 0.5rem;
         }
-
         .item-descuento-badge {
             display: inline-block;
             padding: 0.25rem 0.5rem;
@@ -82,7 +60,6 @@
             font-weight: bold;
             margin-left: 0.5rem;
         }
-
         .item-controles {
             display: flex;
             align-items: center;
@@ -90,7 +67,6 @@
             margin-top: 0.5rem;
             flex-wrap: wrap;
         }
-
         .cantidad-control {
             display: flex;
             align-items: center;
@@ -99,7 +75,6 @@
             border-radius: 4px;
             padding: 0.25rem;
         }
-
         .cantidad-control button {
             width: 30px;
             height: 30px;
@@ -109,47 +84,26 @@
             border-radius: 4px;
             font-size: 1.125rem;
         }
-
-        .cantidad-control button:hover {
-            background: #e0e0e0;
-        }
-
-        .cantidad-control span {
-            min-width: 30px;
-            text-align: center;
-        }
-
-        .item-precio {
-            text-align: right;
-            min-width: 120px;
-        }
-
+        .cantidad-control button:hover { background: #e0e0e0; }
+        .cantidad-control span { min-width: 30px; text-align: center; }
+        .item-precio { text-align: right; min-width: 120px; }
         .precio-original {
             font-size: 0.875rem;
             color: #999;
             text-decoration: line-through;
             margin-bottom: 0.25rem;
         }
-
-        .precio-unitario {
-            font-size: 0.875rem;
-            color: #666;
-            margin-bottom: 0.25rem;
-        }
-
         .precio-con-descuento {
             font-size: 1rem;
             font-weight: bold;
             color: #4CAF50;
         }
-
         .precio-total {
             font-size: 1.25rem;
             font-weight: bold;
             color: #4CAF50;
             margin-top: 0.25rem;
         }
-
         .btn-eliminar {
             background: #f44336;
             color: white;
@@ -159,41 +113,29 @@
             cursor: pointer;
             font-size: 0.875rem;
         }
-
-        .btn-eliminar:hover {
-            background: #d32f2f;
-        }
-
+        .btn-eliminar:hover { background: #d32f2f; }
         .carrito-sidebar {
             position: sticky;
             top: 20px;
             height: fit-content;
         }
-
         .resumen-pedido {
             background: white;
             border-radius: 8px;
             padding: 1.5rem;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-
         .resumen-pedido h3 {
             margin: 0 0 1rem 0;
             padding-bottom: 1rem;
             border-bottom: 2px solid #eee;
         }
-
         .resumen-linea {
             display: flex;
             justify-content: space-between;
             margin-bottom: 0.75rem;
         }
-
-        .resumen-ahorro {
-            color: #4CAF50;
-            font-weight: bold;
-        }
-
+        .resumen-ahorro { color: #4CAF50; font-weight: bold; }
         .resumen-total {
             margin-top: 1rem;
             padding-top: 1rem;
@@ -201,26 +143,19 @@
             font-size: 1.25rem;
             font-weight: bold;
         }
-
         .formulario-cliente {
             margin-top: 1.5rem;
             padding-top: 1.5rem;
             border-top: 2px solid #eee;
         }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
+        .form-group { margin-bottom: 1rem; }
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 500;
             color: #333;
         }
-
-        .form-group input,
-        .form-group textarea {
+        .form-group input, .form-group textarea {
             width: 100%;
             padding: 0.75rem;
             border: 1px solid #ddd;
@@ -228,20 +163,16 @@
             font-size: 1rem;
             box-sizing: border-box;
         }
-
-        .form-group input:focus,
-        .form-group textarea:focus {
+        .form-group input:focus, .form-group textarea:focus {
             outline: none;
             border-color: #4CAF50;
         }
-
         .payment-methods {
             display: flex;
             flex-direction: column;
             gap: 0.75rem;
             margin-top: 0.5rem;
         }
-
         .payment-option {
             display: flex;
             align-items: center;
@@ -252,38 +183,19 @@
             cursor: pointer;
             transition: all 0.2s;
         }
-
         .payment-option:hover {
             border-color: #4CAF50;
             background: #f9f9f9;
         }
-
         .payment-option input[type="radio"] {
             width: 20px;
             height: 20px;
             cursor: pointer;
         }
-
         .payment-option input[type="radio"]:checked ~ span {
             font-weight: bold;
             color: #4CAF50;
         }
-
-        .payment-option span {
-            font-size: 1rem;
-        }
-
-        .payment-badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            background: #ffa726;
-            color: white;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            margin-left: 0.5rem;
-        }
-
         .btn-proceder-pago {
             width: 100%;
             padding: 1rem;
@@ -296,28 +208,21 @@
             cursor: pointer;
             margin-top: 1rem;
         }
-
-        .btn-proceder-pago:hover:not(:disabled) {
-            background: #45a049;
-        }
-
+        .btn-proceder-pago:hover:not(:disabled) { background: #45a049; }
         .btn-proceder-pago:disabled {
             background: #ccc;
             cursor: not-allowed;
         }
-
         .carrito-vacio {
             text-align: center;
             padding: 3rem;
             color: #999;
         }
-
         .carrito-vacio i {
             font-size: 4rem;
             margin-bottom: 1rem;
             display: block;
         }
-
         .btn-continuar-comprando {
             display: inline-block;
             margin-top: 1rem;
@@ -328,11 +233,6 @@
             border-radius: 4px;
             font-weight: bold;
         }
-
-        .btn-continuar-comprando:hover {
-            background: #45a049;
-        }
-
         .modal-pago {
             display: none;
             position: fixed;
@@ -344,7 +244,6 @@
             background: rgba(0,0,0,0.5);
             overflow-y: auto;
         }
-
         .modal-pago-content {
             background: white;
             margin: 5% auto;
@@ -354,24 +253,20 @@
             max-height: 85vh;
             overflow-y: auto;
         }
-
         .pago-mensaje {
             padding: 1rem;
             border-radius: 4px;
             margin-bottom: 1rem;
             text-align: center;
         }
-
         .pago-mensaje.exito {
             background: #d4edda;
             color: #155724;
         }
-
         .pago-mensaje.error {
             background: #f8d7da;
             color: #721c24;
         }
-
         .loading-spinner {
             border: 4px solid #f3f3f3;
             border-top: 4px solid #4CAF50;
@@ -381,12 +276,10 @@
             animation: spin 1s linear infinite;
             margin: 2rem auto;
         }
-
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
         .alert {
             position: fixed;
             top: 20px;
@@ -397,33 +290,22 @@
             z-index: 10000;
             animation: slideInAlert 0.3s ease;
         }
-
         .alert.success {
             background: #d4edda;
             color: #155724;
         }
-
         .alert.error {
             background: #f8d7da;
             color: #721c24;
         }
-
         @keyframes slideInAlert {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
-
         .qr-code-container {
             text-align: center;
             padding: 2rem;
         }
-
         .qr-code-container img {
             max-width: 300px;
             margin: 1rem auto;
@@ -432,7 +314,6 @@
             padding: 1rem;
             background: white;
         }
-
         .payment-instructions {
             background: #fff3cd;
             border-left: 4px solid #ffa726;
@@ -440,21 +321,10 @@
             margin: 1rem 0;
             border-radius: 4px;
         }
-
         .payment-instructions h4 {
             margin: 0 0 0.5rem 0;
             color: #f57c00;
         }
-
-        .payment-instructions ol {
-            margin: 0.5rem 0 0 1.25rem;
-            padding: 0;
-        }
-
-        .payment-instructions li {
-            margin: 0.25rem 0;
-        }
-
         .btn-pagar {
             width: 100%;
             padding: 1rem;
@@ -466,27 +336,10 @@
             font-weight: bold;
             cursor: pointer;
         }
-
-        .btn-pagar:hover:not(:disabled) {
-            background: #45a049;
-        }
-
+        .btn-pagar:hover:not(:disabled) { background: #45a049; }
         .btn-pagar:disabled {
             background: #ccc;
             cursor: not-allowed;
-        }
-
-        .simulacion-notice {
-            background: #e3f2fd;
-            border-left: 4px solid #2196F3;
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: 4px;
-        }
-
-        .simulacion-notice h4 {
-            margin: 0 0 0.5rem 0;
-            color: #1976d2;
         }
     </style>
 </head>
@@ -508,7 +361,7 @@
 
     <section class="hero">
         <h2>Mi Carrito de Compras</h2>
-        <p>Revisa tu pedido y procede al pago (Modo Simulado)</p>
+        <p>Revisa tu pedido y procede al pago</p>
     </section>
 
     <div class="carrito-container">
@@ -522,7 +375,6 @@
         <div class="carrito-sidebar">
             <div class="resumen-pedido">
                 <h3>Resumen del Pedido</h3>
-                
                 <div class="resumen-linea">
                     <span>Subtotal:</span>
                     <span id="subtotal">Bs 0.00</span>
@@ -559,21 +411,20 @@
                             <label for="direccion">Dirección de Entrega</label>
                             <textarea id="direccion" rows="3"></textarea>
                         </div>
-                        
                         <div class="form-group">
-                            <label>Método de Pago (Simulado) *</label>
+                            <label>Método de Pago *</label>
                             <div class="payment-methods">
                                 <label class="payment-option">
                                     <input type="radio" name="metodo_pago" value="tarjeta" checked>
-                                    <span>💳 Tarjeta de Crédito/Débito <span class="payment-badge">SIMULADO</span></span>
+                                    <span>💳 Tarjeta de Crédito/Débito</span>
                                 </label>
                                 <label class="payment-option">
                                     <input type="radio" name="metodo_pago" value="efectivo">
-                                    <span>💵 Efectivo <span class="payment-badge">SIMULADO</span></span>
+                                    <span>💵 Efectivo</span>
                                 </label>
                                 <label class="payment-option">
                                     <input type="radio" name="metodo_pago" value="qr">
-                                    <span>📱 Pago QR <span class="payment-badge">SIMULADO</span></span>
+                                    <span>📱 Pago QR</span>
                                 </label>
                             </div>
                         </div>
@@ -581,7 +432,7 @@
                 </div>
 
                 <button class="btn-proceder-pago" id="btnProcederPago" disabled>
-                    Proceder al Pago (Simulado)
+                    Proceder al Pago
                 </button>
             </div>
         </div>
@@ -589,58 +440,40 @@
 
     <div id="modalPago" class="modal-pago">
         <div class="modal-pago-content">
-            <h3 id="modalPagoTitulo">Procesando Pago Simulado</h3>
+            <h3 id="modalPagoTitulo">Procesando Pago</h3>
             <div id="pagoMensaje"></div>
             
             <div id="modalPagoContenido">
                 <div id="tarjeta-content" style="display:none;">
-                    <div class="simulacion-notice">
-                        <h4>🔄 Modo Simulación - Pago con Tarjeta</h4>
-                        <p>Este es un pago simulado. Al confirmar, tu pedido será procesado automáticamente sin cargo real.</p>
-                    </div>
                     <div class="payment-instructions">
-                        <h4>✨ Proceso Automático</h4>
-                        <p><strong>Monto a simular:</strong> <span id="tarjeta-monto">Bs 0.00</span></p>
+                        <h4>✨ Pago Automático</h4>
+                        <p><strong>Monto a pagar:</strong> <span id="tarjeta-monto">Bs 0.00</span></p>
                         <p>El sistema confirmará tu pedido instantáneamente.</p>
                     </div>
-                    <button id="btnConfirmarTarjeta" class="btn-pagar">
-                        Confirmar Pago Simulado
-                    </button>
+                    <button id="btnConfirmarTarjeta" class="btn-pagar">Confirmar Pago</button>
                 </div>
                 
                 <div id="efectivo-content" style="display:none;">
-                    <div class="simulacion-notice">
-                        <h4>🔄 Modo Simulación - Pago en Efectivo</h4>
-                        <p>Este es un pago simulado. Tu pedido será confirmado automáticamente.</p>
-                    </div>
                     <div class="payment-instructions">
-                        <h4>✨ Proceso Automático</h4>
-                        <p><strong>Monto simulado:</strong> <span id="efectivo-monto">Bs 0.00</span></p>
-                        <p>En un escenario real, pagarías en efectivo al recibir tu pedido.</p>
+                        <h4>✨ Pago en Efectivo</h4>
+                        <p><strong>Monto a pagar:</strong> <span id="efectivo-monto">Bs 0.00</span></p>
+                        <p>Pagarás en efectivo al recibir tu pedido.</p>
                     </div>
-                    <button id="btnConfirmarEfectivo" class="btn-pagar">
-                        Confirmar Pedido (Simulado)
-                    </button>
+                    <button id="btnConfirmarEfectivo" class="btn-pagar">Confirmar Pedido</button>
                 </div>
                 
                 <div id="qr-content" style="display:none;">
-                    <div class="simulacion-notice">
-                        <h4>🔄 Modo Simulación - Pago QR</h4>
-                        <p>Este es un pago simulado. El código QR es de ejemplo y tu pedido se confirmará automáticamente.</p>
-                    </div>
                     <div class="payment-instructions">
-                        <h4>✨ Proceso Automático</h4>
-                        <p><strong>Monto simulado:</strong> <span id="qr-monto">Bs 0.00</span></p>
+                        <h4>✨ Pago con QR</h4>
+                        <p><strong>Monto a pagar:</strong> <span id="qr-monto">Bs 0.00</span></p>
                     </div>
                     <div class="qr-code-container">
-                        <img id="qr-code-img" src="" alt="Código QR simulado">
-                        <p><strong>Cuenta:</strong> 1234567890 (Ejemplo)</p>
-                        <p><strong>Banco:</strong> Banco Nacional (Simulado)</p>
+                        <img id="qr-code-img" src="" alt="Código QR">
+                        <p><strong>Cuenta:</strong> 1234567890</p>
+                        <p><strong>Banco:</strong> Banco Nacional</p>
                         <p><strong>Nombre:</strong> Comida Sobrante</p>
                     </div>
-                    <button id="btnConfirmarQR" class="btn-pagar">
-                        Confirmar Pago Simulado
-                    </button>
+                    <button id="btnConfirmarQR" class="btn-pagar">Confirmar Pago</button>
                 </div>
             </div>
             
@@ -655,316 +488,307 @@
     </footer>
 
 <script>
-    const API_BASE = location.hostname.includes('netlify.app') || location.hostname.includes('github.io')
-        ? 'https://proyecto-comida-backend.onrender.com'
-        : 'http://localhost:3000';
+const API_BASE = location.hostname.includes('netlify.app') || location.hostname.includes('github.io')
+    ? 'https://proyecto-comida-backend.onrender.com'
+    : 'http://localhost:3000';
 
-    let sessionId = localStorage.getItem('session_id') || generateSessionId();
-    let carrito = null;
+let sessionId = localStorage.getItem('session_id') || generateSessionId();
+let carrito = null;
 
-    function mostrarMensaje(mensaje, tipo = 'info') {
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `alert ${tipo}`;
-        alertDiv.textContent = mensaje;
-        document.body.appendChild(alertDiv);
-        setTimeout(() => alertDiv.remove(), 4000);
-    }
+function mostrarMensaje(msg, tipo = 'info') {
+    const d = document.createElement('div');
+    d.className = `alert ${tipo}`;
+    d.textContent = msg;
+    document.body.appendChild(d);
+    setTimeout(() => d.remove(), 4000);
+}
 
-    function mostrarMensajePago(mensaje, tipo) {
-        const container = document.getElementById('pagoMensaje');
-        container.innerHTML = `<div class="pago-mensaje ${tipo}">${mensaje}</div>`;
-    }
+function mostrarMensajePago(msg, tipo) {
+    document.getElementById('pagoMensaje').innerHTML = `<div class="pago-mensaje ${tipo}">${msg}</div>`;
+}
 
-    function generateSessionId() {
-        const id = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem('session_id', id);
-        return id;
-    }
+function generateSessionId() {
+    const id = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('session_id', id);
+    return id;
+}
 
-    document.addEventListener('DOMContentLoaded', async () => {
-        await cargarCarrito();
-        setupEventListeners();
+document.addEventListener('DOMContentLoaded', async () => {
+    await cargarCarrito();
+    setupEventListeners();
+});
+
+function setupEventListeners() {
+    document.getElementById('btnProcederPago').addEventListener('click', procesarPago);
+    ['nombreCliente', 'emailCliente'].forEach(id => {
+        document.getElementById(id).addEventListener('input', validarFormulario);
     });
+    window.onclick = (e) => {
+        if (e.target === document.getElementById('modalPago')) cerrarModalPago();
+    };
+}
 
-    function setupEventListeners() {
-        document.getElementById('btnProcederPago').addEventListener('click', procesarPago);
-        ['nombreCliente', 'emailCliente'].forEach(id => {
-            document.getElementById(id).addEventListener('input', validarFormulario);
+function validarFormulario() {
+    const nombre = document.getElementById('nombreCliente').value.trim();
+    const email = document.getElementById('emailCliente').value.trim();
+    const items = carrito?.items?.length || 0;
+    document.getElementById('btnProcederPago').disabled = !nombre || !email || items === 0;
+}
+
+async function cargarCarrito() {
+    try {
+        const r = await fetch(`${API_BASE}/api/carrito`, {
+            headers: { 'x-session-id': sessionId }
         });
-        window.onclick = function(event) {
-            const modal = document.getElementById('modalPago');
-            if (event.target === modal) cerrarModalPago();
-        };
+        if (!r.ok) throw new Error('Error al cargar carrito');
+        carrito = await r.json();
+        console.log('🛒 Carrito:', carrito);
+        renderizarCarrito();
+        actualizarResumen();
+        validarFormulario();
+    } catch (e) {
+        console.error('❌', e);
+        mostrarMensaje('Error al cargar carrito', 'error');
+    }
+}
+
+function renderizarCarrito() {
+    const c = document.getElementById('carritoItemsContainer');
+    const items = carrito?.items || [];
+    if (!items.length) {
+        c.innerHTML = `<div class="carrito-vacio"><i>🛒</i><h3>Tu carrito está vacío</h3><a href="comida.html" class="btn-continuar-comprando">Explorar Comidas</a></div>`;
+        return;
     }
 
-    function validarFormulario() {
-        const nombre = document.getElementById('nombreCliente').value.trim();
-        const email = document.getElementById('emailCliente').value.trim();
-        const items = carrito?.items?.length || 0;
-        document.getElementById('btnProcederPago').disabled = !nombre || !email || items === 0;
-    }
-
-    async function cargarCarrito() {
-        try {
-            const response = await fetch(`${API_BASE}/api/carrito`, {
-                headers: { 'x-session-id': sessionId }
-            });
-            if (!response.ok) throw new Error('Error al cargar carrito');
-            carrito = await response.json();
-            console.log('🛒 Carrito cargado:', carrito);
-            renderizarCarrito();
-            actualizarResumen();
-            validarFormulario();
-        } catch (error) {
-            console.error('❌ Error:', error);
-            mostrarMensaje('Error al cargar el carrito. Verifica la conexión con el servidor.', 'error');
-        }
-    }
-
-    function renderizarCarrito() {
-        const container = document.getElementById('carritoItemsContainer');
-        const items = carrito?.items || [];
-        if (items.length === 0) {
-            container.innerHTML = `
-                <div class="carrito-vacio">
-                    <i>🛒</i>
-                    <h3>Tu carrito está vacío</h3>
-                    <a href="comida.html" class="btn-continuar-comprando">Explorar Comidas</a>
-                </div>`;
-            return;
-        }
-
-        container.innerHTML = items.map(item => {
-            const precioUnitario = parseFloat(item.precio_unitario || 0);
-            const precioOriginal = parseFloat(item.precio_original || precioUnitario * 1.5);
-            const descuento = item.descuento_porcentaje || Math.round(((precioOriginal - precioUnitario) / precioOriginal) * 100);
-            const subtotal = parseFloat(item.subtotal || 0);
-            
-            return `
-            <div class="carrito-item">
-                <div class="item-info">
-                    <h4>${item.nombre}</h4>
-                    <div class="item-empresa">
-                        <i>🏪</i>
-                        <span>${item.empresa || 'Restaurante Local'}</span>
+    c.innerHTML = items.map(i => {
+        const pu = parseFloat(i.precio_unitario || 0);
+        const po = parseFloat(i.precio_original || pu * 1.5);
+        const d = i.descuento_porcentaje || Math.round(((po - pu) / po) * 100);
+        const st = parseFloat(i.subtotal || 0);
+        
+        return `<div class="carrito-item">
+            <div class="item-info">
+                <h4>${i.nombre}</h4>
+                <div class="item-empresa"><i>🏪</i><span>${i.empresa || 'Restaurante Local'}</span></div>
+                <div><span class="item-categoria">${i.categoria || 'Sin categoría'}</span>${d > 0 ? `<span class="item-descuento-badge">-${d}%</span>` : ''}</div>
+                <div class="item-controles">
+                    <div class="cantidad-control">
+                        <button onclick="cambiarCantidad(${i.id}, ${i.cantidad - 1})">−</button>
+                        <span>${i.cantidad}</span>
+                        <button onclick="cambiarCantidad(${i.id}, ${i.cantidad + 1})">+</button>
                     </div>
-                    <div>
-                        <span class="item-categoria">${item.categoria || 'Sin categoría'}</span>
-                        ${descuento > 0 ? `<span class="item-descuento-badge">-${descuento}%</span>` : ''}
-                    </div>
-                    <div class="item-controles">
-                        <div class="cantidad-control">
-                            <button onclick="cambiarCantidad(${item.id}, ${item.cantidad - 1})">−</button>
-                            <span>${item.cantidad}</span>
-                            <button onclick="cambiarCantidad(${item.id}, ${item.cantidad + 1})">+</button>
-                        </div>
-                        <button class="btn-eliminar" onclick="eliminarItem(${item.id})">Eliminar</button>
-                    </div>
+                    <button class="btn-eliminar" onclick="eliminarItem(${i.id})">Eliminar</button>
                 </div>
-                <div class="item-precio">
-                    ${descuento > 0 ? `<div class="precio-original">Bs ${precioOriginal.toFixed(2)}</div>` : ''}
-                    <div class="precio-con-descuento">Bs ${precioUnitario.toFixed(2)} c/u</div>
-                    <div class="precio-total">Bs ${subtotal.toFixed(2)}</div>
-                </div>
-            </div>`;
-        }).join('');
+            </div>
+            <div class="item-precio">
+                ${d > 0 ? `<div class="precio-original">Bs ${po.toFixed(2)}</div>` : ''}
+                <div class="precio-con-descuento">Bs ${pu.toFixed(2)} c/u</div>
+                <div class="precio-total">Bs ${st.toFixed(2)}</div>
+            </div>
+        </div>`;
+    }).join('');
 
-        document.getElementById('cartCount').textContent = items.reduce((sum, i) => sum + i.cantidad, 0);
+    document.getElementById('cartCount').textContent = items.reduce((s, i) => s + i.cantidad, 0);
+}
+
+function actualizarResumen() {
+    const st = carrito?.resumen?.subtotal || 0;
+    const imp = carrito?.resumen?.impuestos || 0;
+    const tot = carrito?.resumen?.total || 0;
+    
+    let ah = 0;
+    if (carrito?.items) {
+        carrito.items.forEach(i => {
+            const pu = parseFloat(i.precio_unitario || 0);
+            const po = parseFloat(i.precio_original || pu * 1.5);
+            ah += (po - pu) * parseInt(i.cantidad || 1);
+        });
     }
+    
+    document.getElementById('subtotal').textContent = `Bs ${st.toFixed(2)}`;
+    document.getElementById('ahorro').textContent = `Bs ${ah.toFixed(2)}`;
+    document.getElementById('impuestos').textContent = `Bs ${imp.toFixed(2)}`;
+    document.getElementById('total').textContent = `Bs ${tot.toFixed(2)}`;
+}
 
-    function actualizarResumen() {
-        const subtotal = carrito?.resumen?.subtotal || 0;
-        const impuestos = carrito?.resumen?.impuestos || 0;
-        const total = carrito?.resumen?.total || 0;
+async function cambiarCantidad(id, cant) {
+    if (cant < 1) return eliminarItem(id);
+    try {
+        const r = await fetch(`${API_BASE}/api/carrito/items/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'x-session-id': sessionId },
+            body: JSON.stringify({ cantidad: cant })
+        });
+        if (!r.ok) throw new Error('Error');
+        await cargarCarrito();
+        mostrarMensaje('Cantidad actualizada', 'success');
+    } catch (e) {
+        mostrarMensaje('Error al actualizar', 'error');
+    }
+}
+
+async function eliminarItem(id) {
+    if (!confirm('¿Eliminar este producto?')) return;
+    try {
+        const r = await fetch(`${API_BASE}/api/carrito/items/${id}`, {
+            method: 'DELETE',
+            headers: { 'x-session-id': sessionId }
+        });
+        if (!r.ok) throw new Error('Error');
+        await cargarCarrito();
+        mostrarMensaje('Producto eliminado', 'success');
+    } catch (e) {
+        mostrarMensaje('Error al eliminar', 'error');
+    }
+}
+
+async function procesarPago() {
+    const btn = document.getElementById('btnProcederPago');
+    btn.disabled = true;
+    btn.textContent = 'Procesando...';
+    
+    try {
+        if (!carrito?.items?.length) throw new Error('Carrito vacío');
+        const tot = parseFloat(carrito.resumen?.total || 0);
+        if (tot <= 0) throw new Error('Total inválido');
+
+        const nom = document.getElementById('nombreCliente').value.trim();
+        const em = document.getElementById('emailCliente').value.trim();
+        const tel = document.getElementById('telefonoCliente').value.trim();
+        const dir = document.getElementById('direccion').value.trim();
+        if (!nom || !em) throw new Error('Completa los campos obligatorios');
+
+        const met = document.querySelector('input[name="metodo_pago"]:checked')?.value || 'tarjeta';
+
+        const r = await fetch(`${API_BASE}/api/carrito/info`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'x-session-id': sessionId },
+            body: JSON.stringify({
+                nombre_cliente: nom,
+                email_cliente: em,
+                telefono_cliente: tel || null,
+                direccion: dir || null
+            })
+        });
+        if (!r.ok) throw new Error('Error al guardar info');
+
+        await mostrarModalPago(met, tot);
+    } catch (e) {
+        mostrarMensaje(e.message, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Proceder al Pago';
+    }
+}
+
+async function mostrarModalPago(met, tot) {
+    const m = document.getElementById('modalPago');
+    const t = document.getElementById('modalPagoTitulo');
+    
+    document.getElementById('tarjeta-content').style.display = 'none';
+    document.getElementById('efectivo-content').style.display = 'none';
+    document.getElementById('qr-content').style.display = 'none';
+    document.getElementById('pagoMensaje').innerHTML = '';
+    m.style.display = 'block';
+
+    if (met === 'tarjeta') {
+        t.textContent = 'Pago con Tarjeta';
+        document.getElementById('tarjeta-content').style.display = 'block';
+        document.getElementById('tarjeta-monto').textContent = `Bs ${tot.toFixed(2)}`;
+        document.getElementById('btnConfirmarTarjeta').onclick = () => confirmarPagoTarjeta();
+    } else if (met === 'efectivo') {
+        t.textContent = 'Pago en Efectivo';
+        document.getElementById('efectivo-content').style.display = 'block';
+        document.getElementById('efectivo-monto').textContent = `Bs ${tot.toFixed(2)}`;
+        document.getElementById('btnConfirmarEfectivo').onclick = () => confirmarPagoEfectivo();
+    } else {
+        t.textContent = 'Pago con QR';
+        document.getElementById('qr-content').style.display = 'block';
+        document.getElementById('qr-monto').textContent = `Bs ${tot.toFixed(2)}`;
+        const qr = `Comida Sobrante|Monto: Bs ${tot.toFixed(2)}|Pedido: ${sessionId}`;
+        document.getElementById('qr-code-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qr)}`;
+        document.getElementById('btnConfirmarQR').onclick = () => confirmarPagoQR();
+    }
+}
+
+async function confirmarPagoTarjeta() {
+    const btn = document.getElementById('btnConfirmarTarjeta');
+    btn.disabled = true;
+    btn.textContent = '⏳ Procesando...';
+
+    try {
+        const r1 = await fetch(`${API_BASE}/api/checkout/create-payment-intent`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-session-id': sessionId }
+        });
+        if (!r1.ok) throw new Error((await r1.json()).mensaje || 'Error PaymentIntent');
         
-        let ahorroTotal = 0;
-        if (carrito?.items) {
-            carrito.items.forEach(item => {
-                const precioUnitario = parseFloat(item.precio_unitario || 0);
-                const precioOriginal = parseFloat(item.precio_original || precioUnitario * 1.5);
-                const cantidad = parseInt(item.cantidad || 1);
-                ahorroTotal += (precioOriginal - precioUnitario) * cantidad;
-            });
-        }
-        
-        document.getElementById('subtotal').textContent = `Bs ${subtotal.toFixed(2)}`;
-        document.getElementById('ahorro').textContent = `Bs ${ahorroTotal.toFixed(2)}`;
-        document.getElementById('impuestos').textContent = `Bs ${impuestos.toFixed(2)}`;
-        document.getElementById('total').textContent = `Bs ${total.toFixed(2)}`;
+        const { paymentIntentId } = await r1.json();
+
+        const r2 = await fetch(`${API_BASE}/api/checkout/confirm`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-session-id': sessionId },
+            body: JSON.stringify({ paymentIntentId })
+        });
+        if (!r2.ok) throw new Error((await r2.json()).mensaje || 'Error confirmar');
+
+        mostrarMensajePago('¡Pago exitoso! ✅ Redirigiendo...', 'exito');
+        localStorage.removeItem('session_id');
+        setTimeout(() => window.location.href = 'pedidos.html', 2000);
+    } catch (e) {
+        mostrarMensajePago(`Error: ${e.message}`, 'error');
+        btn.disabled = false;
+        btn.textContent = 'Confirmar Pago';
     }
+}
 
-    async function cambiarCantidad(itemId, nuevaCantidad) {
-        if (nuevaCantidad < 1) {
-            return eliminarItem(itemId);
-        }
-        try {
-            const response = await fetch(`${API_BASE}/api/carrito/items/${itemId}`, {
-                method: 'PUT',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'x-session-id': sessionId 
-                },
-                body: JSON.stringify({ cantidad: nuevaCantidad })
-            });
-            if (!response.ok) throw new Error('Error al actualizar cantidad');
-            await cargarCarrito();
-            mostrarMensaje('Cantidad actualizada', 'success');
-        } catch (error) {
-            console.error('❌ Error:', error);
-            mostrarMensaje('Error al actualizar cantidad', 'error');
-        }
+async function confirmarPagoEfectivo() {
+    const btn = document.getElementById('btnConfirmarEfectivo');
+    btn.disabled = true;
+    btn.textContent = '⏳ Procesando...';
+
+    try {
+        const r = await fetch(`${API_BASE}/api/checkout/confirm-efectivo`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-session-id': sessionId }
+        });
+        if (!r.ok) throw new Error((await r.json()).mensaje || 'Error');
+
+        mostrarMensajePago('¡Pedido confirmado! ✅ Paga al recibirlo. Redirigiendo...', 'exito');
+        localStorage.removeItem('session_id');
+        setTimeout(() => window.location.href = 'pedidos.html', 2000);
+    } catch (e) {
+        mostrarMensajePago(`Error: ${e.message}`, 'error');
+        btn.disabled = false;
+        btn.textContent = 'Confirmar Pedido';
     }
+}
 
-    async function eliminarItem(itemId) {
-        if (!confirm('¿Eliminar este producto del carrito?')) return;
-        try {
-            const response = await fetch(`${API_BASE}/api/carrito/items/${itemId}`, {
-                method: 'DELETE',
-                headers: { 'x-session-id': sessionId }
-            });
-            if (!response.ok) throw new Error('Error al eliminar item');
-            await cargarCarrito();
-            mostrarMensaje('Producto eliminado del carrito', 'success');
-        } catch (error) {
-            console.error('❌ Error:', error);
-            mostrarMensaje('Error al eliminar producto', 'error');
-        }
+async function confirmarPagoQR() {
+    const btn = document.getElementById('btnConfirmarQR');
+    btn.disabled = true;
+    btn.textContent = '⏳ Procesando...';
+
+    try {
+        const r = await fetch(`${API_BASE}/api/checkout/confirm-qr`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-session-id': sessionId }
+        });
+        if (!r.ok) throw new Error((await r.json()).mensaje || 'Error');
+
+        mostrarMensajePago('¡Pago QR registrado! ✅ Verificaremos tu transacción. Redirigiendo...', 'exito');
+        localStorage.removeItem('session_id');
+        setTimeout(() => window.location.href = 'pedidos.html', 2000);
+    } catch (e) {
+        mostrarMensajePago(`Error: ${e.message}`, 'error');
+        btn.disabled = false;
+        btn.textContent = 'Confirmar Pago';
     }
+}
 
-    async function procesarPago() {
-        const btn = document.getElementById('btnProcederPago');
-        btn.disabled = true;
-        btn.textContent = 'Procesando...';
-        
-        try {
-            if (!carrito || !carrito.items?.length) throw new Error('El carrito está vacío');
-
-            const total = parseFloat(carrito.resumen?.total || 0);
-            if (total <= 0) throw new Error('El total del carrito debe ser mayor a 0');
-
-            const nombre = document.getElementById('nombreCliente').value.trim();
-            const email = document.getElementById('emailCliente').value.trim();
-            const telefono = document.getElementById('telefonoCliente').value.trim();
-            const direccion = document.getElementById('direccion').value.trim();
-            if (!nombre || !email) throw new Error('Completa los campos obligatorios');
-
-            const metodoPago = document.querySelector('input[name="metodo_pago"]:checked')?.value || 'tarjeta';
-
-            console.log('💾 Guardando información del cliente...');
-            const infoResponse = await fetch(`${API_BASE}/api/carrito/info`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json', 'x-session-id': sessionId },
-                body: JSON.stringify({
-                    nombre_cliente: nombre,
-                    email_cliente: email,
-                    telefono_cliente: telefono || null,
-                    direccion: direccion || null
-                })
-            });
-            if (!infoResponse.ok) throw new Error('Error al guardar información del cliente');
-
-            await mostrarModalPago(metodoPago, total);
-            
-        } catch (error) {
-            console.error('❌ Error al procesar pago:', error);
-            mostrarMensaje(error.message, 'error');
-        } finally {
-            btn.disabled = false;
-            btn.textContent = 'Proceder al Pago (Simulado)';
-        }
-    }
-
-    async function mostrarModalPago(metodo, total) {
-        const modal = document.getElementById('modalPago');
-        const titulo = document.getElementById('modalPagoTitulo');
-        const mensaje = document.getElementById('pagoMensaje');
-
-        document.getElementById('tarjeta-content').style.display = 'none';
-        document.getElementById('efectivo-content').style.display = 'none';
-        document.getElementById('qr-content').style.display = 'none';
-
-        modal.style.display = 'block';
-        mensaje.innerHTML = '';
-
-        if (metodo === 'tarjeta') {
-            titulo.textContent = 'Pago Simulado con Tarjeta';
-            document.getElementById('tarjeta-content').style.display = 'block';
-            document.getElementById('tarjeta-monto').textContent = `Bs ${total.toFixed(2)}`;
-            
-            document.getElementById('btnConfirmarTarjeta').onclick = async () => {
-                await confirmarPagoSimulado(metodo);
-            };
-        } else if (metodo === 'efectivo') {
-            titulo.textContent = 'Pago Simulado en Efectivo';
-            document.getElementById('efectivo-content').style.display = 'block';
-            document.getElementById('efectivo-monto').textContent = `Bs ${total.toFixed(2)}`;
-            
-            document.getElementById('btnConfirmarEfectivo').onclick = async () => {
-                await confirmarPagoSimulado(metodo);
-            };
-        } else if (metodo === 'qr') {
-            titulo.textContent = 'Pago Simulado con QR';
-            document.getElementById('qr-content').style.display = 'block';
-            document.getElementById('qr-monto').textContent = `Bs ${total.toFixed(2)}`;
-            
-            const qrData = `SIMULADO - Comida Sobrante|Monto: Bs ${total.toFixed(2)}|Pedido: ${sessionId}`;
-            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrData)}`;
-            document.getElementById('qr-code-img').src = qrUrl;
-            
-            document.getElementById('btnConfirmarQR').onclick = async () => {
-                await confirmarPagoSimulado(metodo);
-            };
-        }
-    }
-
-    async function confirmarPagoSimulado(metodoPago) {
-        const btnId = metodoPago === 'tarjeta' ? 'btnConfirmarTarjeta' : 
-                     metodoPago === 'efectivo' ? 'btnConfirmarEfectivo' : 'btnConfirmarQR';
-        const btn = document.getElementById(btnId);
-        const textoOriginal = btn.textContent;
-        
-        btn.disabled = true;
-        btn.textContent = '⏳ Procesando pago simulado...';
-
-        try {
-            console.log('🔄 Confirmando pago simulado con método:', metodoPago);
-            
-            const response = await fetch(`${API_BASE}/api/pedidos/crear-desde-carrito`, {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'x-session-id': sessionId 
-                },
-                body: JSON.stringify({ metodo_pago: metodoPago })
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.mensaje || 'Error al confirmar pedido');
-            }
-
-            const data = await response.json();
-            console.log('✅ Respuesta del servidor:', data);
-
-            mostrarMensajePago('¡Pago simulado exitoso! ✅ Redirigiendo a tus pedidos...', 'exito');
-            
-            localStorage.removeItem('session_id');
-            
-            setTimeout(() => {
-                window.location.href = 'pedidos.html';
-            }, 2000);
-
-        } catch (error) {
-            console.error('❌ Error al confirmar pago simulado:', error);
-            mostrarMensajePago(`Error: ${error.message}`, 'error');
-            btn.disabled = false;
-            btn.textContent = textoOriginal;
-        }
-    }
-
-    function cerrarModalPago() {
-        document.getElementById('modalPago').style.display = 'none';
-    }
+function cerrarModalPago() {
+    document.getElementById('modalPago').style.display = 'none';
+}
 </script>
 
 </body>

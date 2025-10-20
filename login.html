@@ -9,27 +9,27 @@
 <body class="login-container">
     <div class="login-form">
         <h1>Iniciar Sesión</h1>
-        <p style="text-align: center; color: #666; margin-bottom: 1.5rem;">
+        <p class="text-center" style="color: #666; margin-bottom: 1.5rem;">
             Accede a tu cuenta
         </p>
 
         <form id="loginForm">
             <label for="username">Nombre de usuario:</label>
-            <input type="text" id="username" name="username" required>
+            <input type="text" id="username" name="username" required autocomplete="username">
             
             <label for="password">Contraseña:</label>
-            <input type="password" id="password" name="password" required>
+            <input type="password" id="password" name="password" required autocomplete="current-password">
             
-            <button type="submit">Iniciar sesión</button>
+            <button type="submit" id="submitBtn">Iniciar sesión</button>
             
-            <div id="error-message" class="alert" style="display: none;"></div>
+            <div id="errorMessage" class="alert"></div>
         </form>
         
-        <p style="text-align: center; margin-top: 20px;">
+        <p class="text-center" style="margin-top: 20px;">
             ¿No tienes cuenta? <a href="register.html">Regístrate aquí</a>
         </p>
         
-        <p style="text-align: center; margin-top: 10px;">
+        <p class="text-center" style="margin-top: 10px;">
             <a href="index.html">Volver al inicio</a>
         </p>
     </div>
@@ -39,102 +39,127 @@
             ? 'https://proyecto-comida-backend.onrender.com'
             : 'http://localhost:3000';
 
-        // Si ya está logueado, redirigir según rol
-        if (localStorage.getItem('isLoggedIn') === 'true') {
-            const rol = localStorage.getItem('userRol');
-            if (rol === 'vendedor') {
+        console.log('🔗 API Base URL:', API_BASE);
+
+        // Verificar si ya está logueado
+        const isLoggedIn = localStorage.getItem('isLoggedIn');
+        const userRol = localStorage.getItem('userRol');
+        
+        if (isLoggedIn === 'true' && userRol) {
+            console.log('✅ Usuario ya logueado, redirigiendo...');
+            if (userRol === 'vendedor') {
                 window.location.href = 'dashboard-vendedor.html';
+            } else if (userRol === 'admin') {
+                window.location.href = 'dashboard.html';
             } else {
                 window.location.href = 'dashboard-usuario.html';
             }
         }
 
         // Manejar el envío del formulario
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        const loginForm = document.getElementById('loginForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
-            const errorMessage = document.getElementById('error-message');
 
-            // Limpiar mensajes de error previos
+            console.log('📝 Intentando login con:', username);
+
+            // Limpiar mensajes previos
             errorMessage.style.display = 'none';
 
-            // Validaciones básicas
+            // Validaciones
             if (!username || !password) {
                 showError('Por favor, completa todos los campos.');
                 return;
             }
 
             try {
-                const submitBtn = document.querySelector('button[type="submit"]');
-                const originalText = submitBtn.textContent;
                 submitBtn.textContent = 'Iniciando sesión...';
                 submitBtn.disabled = true;
 
+                console.log('🌐 Enviando petición a:', `${API_BASE}/auth/login`);
+
                 const response = await fetch(`${API_BASE}/auth/login`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password }),
+                    headers: { 
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
                 });
 
-                const result = await response.json().catch(() => ({}));
+                console.log('📡 Respuesta status:', response.status);
 
-                if (response.ok) {
+                let result;
+                try {
+                    result = await response.json();
+                    console.log('📦 Respuesta del servidor:', result);
+                } catch (jsonError) {
+                    console.error('❌ Error al parsear JSON:', jsonError);
+                    result = {};
+                }
+
+                if (response.ok && result.usuario) {
+                    console.log('✅ Login exitoso');
                     showSuccess('Login exitoso. Redirigiendo...');
                     
-                    // Guardar información del usuario en localStorage
+                    // Guardar información en localStorage
                     localStorage.setItem('isLoggedIn', 'true');
-                    if (result.usuario) {
-                        localStorage.setItem('userId', result.usuario.id);
-                        localStorage.setItem('username', result.usuario.username);
-                        localStorage.setItem('userEmail', result.usuario.email);
-                        localStorage.setItem('userNombre', result.usuario.nombre_completo);
-                        localStorage.setItem('userRol', result.usuario.rol);
-                    }
-                    localStorage.setItem('loginTime', String(Date.now()));
+                    localStorage.setItem('userId', result.usuario.id);
+                    localStorage.setItem('username', result.usuario.username);
+                    localStorage.setItem('userEmail', result.usuario.email || '');
+                    localStorage.setItem('userNombre', result.usuario.nombre_completo || '');
+                    localStorage.setItem('userRol', result.usuario.rol);
+                    localStorage.setItem('loginTime', Date.now().toString());
                     
-                    // Redirigir según el rol
+                    console.log('💾 Datos guardados en localStorage');
+                    console.log('👤 Rol:', result.usuario.rol);
+                    
+                    // Redirigir según rol
                     setTimeout(() => {
                         if (result.usuario.rol === 'vendedor') {
+                            console.log('↪ Redirigiendo a dashboard vendedor');
                             window.location.href = 'dashboard-vendedor.html';
                         } else if (result.usuario.rol === 'admin') {
+                            console.log('↪ Redirigiendo a dashboard admin');
                             window.location.href = 'dashboard.html';
                         } else {
+                            console.log('↪ Redirigiendo a dashboard usuario');
                             window.location.href = 'dashboard-usuario.html';
                         }
                     }, 1200);
                 } else {
-                    showError(result.mensaje || 'Error al iniciar sesión');
-                    submitBtn.textContent = originalText;
+                    console.error('❌ Login fallido:', result.mensaje);
+                    showError(result.mensaje || 'Usuario o contraseña inválidos');
+                    submitBtn.textContent = 'Iniciar sesión';
                     submitBtn.disabled = false;
                 }
 
             } catch (error) {
-                console.error('Error de conexión:', error);
-                showError('Error de conexión. Verifica tu internet e intenta de nuevo.');
-                
-                const submitBtn = document.querySelector('button[type="submit"]');
+                console.error('❌ Error de conexión:', error);
+                showError('Error de conexión con el servidor. Verifica tu internet.');
                 submitBtn.textContent = 'Iniciar sesión';
                 submitBtn.disabled = false;
             }
         });
 
         function showError(message) {
-            const errorMessage = document.getElementById('error-message');
             errorMessage.textContent = message;
-            errorMessage.className = 'alert';
+            errorMessage.className = 'alert error';
             errorMessage.style.display = 'block';
         }
 
         function showSuccess(message) {
-            const errorMessage = document.getElementById('error-message');
             errorMessage.textContent = message;
             errorMessage.className = 'alert success';
             errorMessage.style.display = 'block';
         }
 
-        // Enfocar el primer campo al cargar la página
+        // Enfocar el primer campo
         window.addEventListener('load', () => {
             document.getElementById('username').focus();
         });
