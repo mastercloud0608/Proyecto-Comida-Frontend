@@ -3,11 +3,187 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Pedidos - Comida Sobrante</title>
+    <title>Mis Pedidos - Comida Sobrante</title>
     <link rel="stylesheet" href="assets/styles.css">
+    <style>
+        .pedidos-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .pedido-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .pedido-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #eee;
+        }
+        .pedido-id {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #333;
+        }
+        .estado-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+        }
+        .estado-badge.pendiente {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .estado-badge.confirmado {
+            background: #cfe2ff;
+            color: #084298;
+        }
+        .estado-badge.en-preparacion {
+            background: #e7f3ff;
+            color: #0277bd;
+        }
+        .estado-badge.listo {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        .estado-badge.entregado {
+            background: #d4edda;
+            color: #155724;
+        }
+        .estado-badge.cancelado {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .pedido-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        .info-label {
+            font-size: 0.875rem;
+            color: #666;
+        }
+        .info-value {
+            font-size: 1rem;
+            color: #333;
+            font-weight: 500;
+        }
+        .pedido-items {
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        .pedido-items h4 {
+            margin: 0 0 0.75rem 0;
+            color: #333;
+        }
+        .item-detalle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+        .item-detalle:last-child {
+            margin-bottom: 0;
+        }
+        .pedido-total {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid #ddd;
+            text-align: right;
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        .no-pedidos {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+        }
+        .no-pedidos i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        .btn-volver {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.75rem 1.5rem;
+            background: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4CAF50;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 3rem auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .email-info {
+            background: #e3f2fd;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .email-info strong {
+            color: #1976d2;
+        }
+        .filtro-estado {
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .filtro-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .filtro-btn:hover {
+            border-color: #4CAF50;
+            background: #f1f8f4;
+        }
+        .filtro-btn.active {
+            background: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+    </style>
 </head>
 <body>
-    <!-- Header -->
     <header>
         <div class="logo">
             <h1>Comida Sobrante</h1>
@@ -17,540 +193,211 @@
             <ul>
                 <li><a href="index.html">Inicio</a></li>
                 <li><a href="comida.html">Comidas</a></li>
-                <li><a href="pedidos.html">Pedidos</a></li>
-                <li><a href="#" onclick="mostrarFormularioNuevoPedido()">Nuevo Pedido</a></li>
+                <li><a href="pedidos.html">Mis Pedidos</a></li>
+                <li><a href="carrito.html">🛒 Carrito</a></li>
             </ul>
         </nav>
     </header>
 
-    <!-- Hero Section -->
     <section class="hero">
-        <h2>Gestión de Pedidos</h2>
-        <p>Administra todos los pedidos de la plataforma</p>
+        <h2>Mis Pedidos</h2>
+        <p>Revisa el estado de tus pedidos</p>
     </section>
 
-    <!-- Estadísticas -->
-    <section class="filters">
-        <div class="filter-container">
-            <div class="estadisticas-resumen" id="estadisticasResumen">
-                <div class="stat-item">
-                    <span class="stat-number" id="totalPedidos">0</span>
-                    <span class="stat-label">Total Pedidos</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number" id="pedidosHoy">0</span>
-                    <span class="stat-label">Pedidos Hoy</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number" id="ventasHoy">Bs 0</span>
-                    <span class="stat-label">Ventas Hoy</span>
-                </div>
-            </div>
+    <div class="pedidos-container">
+        <div class="email-info" id="emailInfo" style="display: none;">
+            <span>📧</span>
+            <span>Mostrando pedidos de: <strong id="emailUsuario"></strong></span>
         </div>
-    </section>
 
-    <!-- Filtros -->
-    <section class="filters">
-        <div class="filter-container">
-            <h3>Filtrar Pedidos</h3>
-            <select id="filtroEstado">
-                <option value="">Todos los estados</option>
-                <option value="pendiente">Pendiente</option>
-                <option value="confirmado">Confirmado</option>
-                <option value="en-preparacion">En Preparación</option>
-                <option value="listo">Listo</option>
-                <option value="entregado">Entregado</option>
-                <option value="cancelado">Cancelado</option>
-            </select>
-            <input type="text" id="filtroCliente" placeholder="Buscar por cliente...">
-            <button onclick="filtrarPedidos()">Filtrar</button>
-            <button onclick="cargarPedidos()">Mostrar Todos</button>
+        <div class="filtro-estado">
+            <button class="filtro-btn active" onclick="filtrarPorEstado('')">Todos</button>
+            <button class="filtro-btn" onclick="filtrarPorEstado('pendiente')">Pendiente</button>
+            <button class="filtro-btn" onclick="filtrarPorEstado('confirmado')">Confirmado</button>
+            <button class="filtro-btn" onclick="filtrarPorEstado('en-preparacion')">En Preparación</button>
+            <button class="filtro-btn" onclick="filtrarPorEstado('listo')">Listo</button>
+            <button class="filtro-btn" onclick="filtrarPorEstado('entregado')">Entregado</button>
         </div>
-    </section>
 
-    <!-- Formulario para nuevo pedido -->
-    <section class="pedidos-section" id="nuevoPedidoSection" style="display: none;">
-        <div class="nuevo-pedido-form">
-            <h3>Crear Nuevo Pedido</h3>
-            <form id="formNuevoPedido">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="comidaSelect">Comida:</label>
-                        <select id="comidaSelect" name="comida_id" required>
-                            <option value="">Selecciona una comida...</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="cantidad">Cantidad:</label>
-                        <input type="number" id="cantidad" name="cantidad" min="1" value="1" required>
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="nombreCliente">Nombre del Cliente:</label>
-                        <input type="text" id="nombreCliente" name="nombre_cliente" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="emailCliente">Email:</label>
-                        <input type="email" id="emailCliente" name="email_cliente" required>
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="telefonoCliente">Teléfono:</label>
-                        <input type="tel" id="telefonoCliente" name="telefono_cliente">
-                    </div>
-                    <div class="form-group">
-                        <label for="direccion">Dirección:</label>
-                        <input type="text" id="direccion" name="direccion">
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="notas">Notas Adicionales:</label>
-                    <textarea id="notas" name="notas" placeholder="Instrucciones especiales, alergias, etc."></textarea>
-                </div>
-                
-                <div class="precio-preview">
-                    <strong>Precio Total: Bs <span id="precioTotal">0.00</span></strong>
-                </div>
-                
-                <div class="form-actions">
-                    <button type="submit">Crear Pedido</button>
-                    <button type="button" onclick="ocultarFormularioNuevoPedido()">Cancelar</button>
-                </div>
-            </form>
-        </div>
-    </section>
-
-    <!-- Lista de Pedidos -->
-    <section class="pedidos-section">
-        <div class="comidas-header">
-            <h2>Lista de Pedidos</h2>
-            <div class="loading" id="loading" style="display: none;">Cargando...</div>
-        </div>
-        <div class="pedidos-grid" id="pedidosContainer">
-            <!-- Los pedidos se cargarán dinámicamente aquí -->
-        </div>
-    </section>
-
-    <!-- Modal para editar pedido -->
-    <div id="modalEditarPedido" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="cerrarModalEditar()">&times;</span>
-            <h2>Editar Pedido</h2>
-            <form id="formEditarPedido">
-                <div class="form-group">
-                    <label for="editNombreCliente">Nombre del Cliente:</label>
-                    <input type="text" id="editNombreCliente" name="nombre_cliente" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="editEmailCliente">Email:</label>
-                    <input type="email" id="editEmailCliente" name="email_cliente" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="editTelefonoCliente">Teléfono:</label>
-                    <input type="tel" id="editTelefonoCliente" name="telefono_cliente">
-                </div>
-                
-                <div class="form-group">
-                    <label for="editDireccion">Dirección:</label>
-                    <input type="text" id="editDireccion" name="direccion">
-                </div>
-                
-                <div class="form-group">
-                    <label for="editCantidad">Cantidad:</label>
-                    <input type="number" id="editCantidad" name="cantidad" min="1" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="editEstado">Estado:</label>
-                    <select id="editEstado" name="estado">
-                        <option value="pendiente">Pendiente</option>
-                        <option value="confirmado">Confirmado</option>
-                        <option value="en-preparacion">En Preparación</option>
-                        <option value="listo">Listo</option>
-                        <option value="entregado">Entregado</option>
-                        <option value="cancelado">Cancelado</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="editNotas">Notas:</label>
-                    <textarea id="editNotas" name="notas"></textarea>
-                </div>
-                
-                <div class="form-actions">
-                    <button type="submit">Actualizar Pedido</button>
-                    <button type="button" onclick="cerrarModalEditar()">Cancelar</button>
-                </div>
-                
-                <input type="hidden" id="editPedidoId">
-            </form>
+        <div id="pedidosContainer">
+            <div class="loading-spinner"></div>
         </div>
     </div>
 
-    <!-- Footer -->
     <footer>
-        <p>&copy; 2025 Comida Sobrante. Proyecto de Responsabilidad Social - Unidad Educativa Padre Jaime Gagnon 1</p>
+        <p>&copy; 2025 Comida Sobrante. Proyecto de Responsabilidad Social</p>
     </footer>
 
     <script>
-        // === BASE API (prod/local) ===
-        const API_BASE = location.hostname.endsWith('netlify.app')
-          ? 'https://proyecto-comida-backend.onrender.com' // <-- tu backend público
-          : 'http://localhost:3000';
+        const API_BASE = location.hostname.includes('netlify.app') || location.hostname.includes('github.io')
+            ? 'https://proyecto-comida-backend.onrender.com'
+            : 'http://localhost:3000';
 
-        let pedidos = [];
-        let comidas = [];
-        let editandoPedidoId = null;
+        let todosPedidos = [];
+        let filtroActual = '';
 
-        // Helpers para normalizar respuestas {items, meta} o []
-        const asArray = (data) => Array.isArray(data) ? data : (data?.items || []);
-
-        // Cargar datos al iniciar
-        document.addEventListener('DOMContentLoaded', function() {
-            cargarPedidos();
-            cargarComidas();
-            cargarEstadisticas();
-            
-            // Verificar si hay un parámetro de comida en la URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const comidaId = urlParams.get('comida');
-            if (comidaId) {
-                mostrarFormularioNuevoPedido();
-                // se seleccionará cuando carguen las comidas
-                const checkAndSelect = setInterval(() => {
-                  const sel = document.getElementById('comidaSelect');
-                  if (sel.options.length > 1) {
-                    sel.value = comidaId;
-                    calcularPrecioTotal();
-                    clearInterval(checkAndSelect);
-                  }
-                }, 200);
-                setTimeout(() => clearInterval(checkAndSelect), 3000);
-            }
+        document.addEventListener('DOMContentLoaded', async () => {
+            await cargarPedidosCliente();
         });
 
-        // Cargar todas las comidas para el selector
-        async function cargarComidas() {
-            try {
-                const response = await fetch(`${API_BASE}/api/comidas`);
-                if (!response.ok) throw new Error('Error al cargar comidas');
-                
-                const data = await response.json();
-                comidas = asArray(data);
-
-                const select = document.getElementById('comidaSelect');
-                // limpiar, dejar placeholder
-                select.innerHTML = '<option value="">Selecciona una comida...</option>';
-
-                comidas.forEach(comida => {
-                    const option = document.createElement('option');
-                    option.value = comida.id;
-                    option.textContent = `${comida.nombre} - Bs ${parseFloat(comida.precio).toFixed(2)}`;
-                    option.dataset.precio = comida.precio;
-                    select.appendChild(option);
-                });
-
-                calcularPrecioTotal();
-            } catch (error) {
-                console.error('Error:', error);
-                mostrarMensaje('Error al cargar las comidas', 'error');
+        async function cargarPedidosCliente() {
+            const email = localStorage.getItem('cliente_email');
+            
+            if (!email) {
+                mostrarNoPedidos('No has iniciado sesión. Por favor, realiza un pedido primero.');
+                return;
             }
-        }
 
-        // Cargar todos los pedidos
-        async function cargarPedidos() {
+            document.getElementById('emailInfo').style.display = 'flex';
+            document.getElementById('emailUsuario').textContent = email;
+
             try {
-                mostrarLoading(true);
                 const response = await fetch(`${API_BASE}/api/pedidos`);
                 if (!response.ok) throw new Error('Error al cargar pedidos');
                 
                 const data = await response.json();
-                pedidos = asArray(data);
-                mostrarPedidos(pedidos);
+                const pedidos = Array.isArray(data) ? data : (data?.items || []);
+                
+                // Filtrar solo los pedidos del cliente
+                todosPedidos = pedidos.filter(p => 
+                    p.email_cliente && p.email_cliente.toLowerCase() === email.toLowerCase()
+                );
+
+                console.log('📦 Pedidos del cliente:', todosPedidos);
+                mostrarPedidos(todosPedidos);
             } catch (error) {
                 console.error('Error:', error);
-                mostrarMensaje('Error al cargar los pedidos', 'error');
-            } finally {
-                mostrarLoading(false);
+                mostrarNoPedidos('Error al cargar tus pedidos. Por favor, intenta más tarde.');
             }
         }
 
-        // Cargar estadísticas
-        async function cargarEstadisticas() {
-            try {
-                const response = await fetch(`${API_BASE}/api/pedidos/estadisticas/resumen`);
-                if (!response.ok) throw new Error('Error al cargar estadísticas');
-                
-                const stats = await response.json();
-                document.getElementById('totalPedidos').textContent = stats.total_pedidos ?? 0;
-                document.getElementById('pedidosHoy').textContent = stats.estadisticas_hoy?.pedidos_hoy ?? 0;
-                const ventas = parseFloat(stats.estadisticas_hoy?.ventas_hoy ?? 0);
-                document.getElementById('ventasHoy').textContent = `Bs ${ventas.toFixed(2)}`;
-            } catch (error) {
-                console.error('Error al cargar estadísticas:', error);
-            }
-        }
-
-        // Mostrar pedidos en el grid
-        function mostrarPedidos(pedidosArray) {
+        function mostrarPedidos(pedidos) {
             const container = document.getElementById('pedidosContainer');
             
-            if (!pedidosArray.length) {
-                container.innerHTML = '<div class="no-results">No hay pedidos disponibles</div>';
+            if (!pedidos.length) {
+                mostrarNoPedidos('No tienes pedidos todavía. ¡Explora nuestras comidas disponibles!');
                 return;
             }
 
-            container.innerHTML = pedidosArray.map(pedido => `
-                <div class="pedido-card">
-                    <div class="pedido-header">
-                        <div class="pedido-id">Pedido #${pedido.id}</div>
-                        <span class="estado-badge ${pedido.estado}">${(pedido.estado || '').replace('-', ' ')}</span>
+            // Ordenar por fecha más reciente
+            pedidos.sort((a, b) => new Date(b.fecha_pedido) - new Date(a.fecha_pedido));
+
+            container.innerHTML = pedidos.map(pedido => {
+                const fecha = new Date(pedido.fecha_pedido);
+                const fechaFormato = fecha.toLocaleDateString('es-BO', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                return `
+                    <div class="pedido-card">
+                        <div class="pedido-header">
+                            <div class="pedido-id">Pedido #${pedido.id}</div>
+                            <span class="estado-badge ${pedido.estado}">${formatearEstado(pedido.estado)}</span>
+                        </div>
+
+                        <div class="pedido-info">
+                            <div class="info-item">
+                                <span class="info-label">📅 Fecha</span>
+                                <span class="info-value">${fechaFormato}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">🍽️ Comida</span>
+                                <span class="info-value">${pedido.nombre_comida || 'N/A'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">📦 Cantidad</span>
+                                <span class="info-value">${pedido.cantidad}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">🏪 Categoría</span>
+                                <span class="info-value">${pedido.categoria_comida || 'N/A'}</span>
+                            </div>
+                        </div>
+
+                        ${pedido.direccion ? `
+                            <div class="info-item" style="margin-top: 0.5rem;">
+                                <span class="info-label">📍 Dirección de entrega</span>
+                                <span class="info-value">${pedido.direccion}</span>
+                            </div>
+                        ` : ''}
+
+                        ${pedido.notas ? `
+                            <div class="info-item" style="margin-top: 0.5rem;">
+                                <span class="info-label">📝 Notas</span>
+                                <span class="info-value">${pedido.notas}</span>
+                            </div>
+                        ` : ''}
+
+                        <div class="pedido-total">
+                            Total: Bs ${parseFloat(pedido.precio_total || 0).toFixed(2)}
+                        </div>
+
+                        ${getEstadoMensaje(pedido.estado)}
                     </div>
-                    <div class="pedido-info">
-                        <p><strong>Cliente:</strong> ${pedido.nombre_cliente}</p>
-                        <p><strong>Email:</strong> ${pedido.email_cliente}</p>
-                        <p><strong>Teléfono:</strong> ${pedido.telefono_cliente || 'No proporcionado'}</p>
-                        <p><strong>Comida:</strong> ${pedido.nombre_comida ?? ''}</p>
-                        <p><strong>Categoría:</strong> ${pedido.categoria_comida ?? ''}</p>
-                        <p><strong>Cantidad:</strong> ${pedido.cantidad}</p>
-                        <p><strong>Total:</strong> Bs ${parseFloat(pedido.precio_total ?? 0).toFixed(2)}</p>
-                        <p><strong>Fecha:</strong> ${pedido.fecha_pedido ? new Date(pedido.fecha_pedido).toLocaleString() : ''}</p>
-                        ${pedido.notas ? `<p><strong>Notas:</strong> ${pedido.notas}</p>` : ''}
-                    </div>
-                    <div class="pedido-actions">
-                        <button class="btn-actualizar" onclick="editarPedido(${pedido.id})">Editar</button>
-                        ${pedido.estado === 'pendiente' ? `
-                            <button class="btn-confirmar" onclick="cambiarEstado(${pedido.id}, 'confirmado')">Confirmar</button>
-                        ` : ''}
-                        ${pedido.estado === 'confirmado' ? `
-                            <button class="btn-confirmar" onclick="cambiarEstado(${pedido.id}, 'en-preparacion')">En Preparación</button>
-                        ` : ''}
-                        ${pedido.estado === 'en-preparacion' ? `
-                            <button class="btn-confirmar" onclick="cambiarEstado(${pedido.id}, 'listo')">Marcar Listo</button>
-                        ` : ''}
-                        ${pedido.estado === 'listo' ? `
-                            <button class="btn-confirmar" onclick="cambiarEstado(${pedido.id}, 'entregado')">Entregado</button>
-                        ` : ''}
-                        ${['pendiente', 'confirmado'].includes(pedido.estado) ? `
-                            <button class="btn-cancelar" onclick="cambiarEstado(${pedido.id}, 'cancelado')">Cancelar</button>
-                        ` : ''}
-                        <button class="btn-cancelar" onclick="eliminarPedido(${pedido.id})">Eliminar</button>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
-        // Filtrar pedidos
-        function filtrarPedidos() {
-            const filtroEstado = document.getElementById('filtroEstado').value;
-            const filtroCliente = document.getElementById('filtroCliente').value.toLowerCase();
+        function formatearEstado(estado) {
+            const estados = {
+                'pendiente': 'Pendiente',
+                'confirmado': 'Confirmado',
+                'en-preparacion': 'En Preparación',
+                'listo': 'Listo para Recoger',
+                'entregado': 'Entregado',
+                'cancelado': 'Cancelado'
+            };
+            return estados[estado] || estado;
+        }
+
+        function getEstadoMensaje(estado) {
+            const mensajes = {
+                'pendiente': '⏳ Tu pedido está siendo procesado',
+                'confirmado': '✅ Tu pedido ha sido confirmado',
+                'en-preparacion': '👨‍🍳 Tu comida se está preparando',
+                'listo': '🎉 ¡Tu pedido está listo! Puedes recogerlo',
+                'entregado': '✨ Pedido entregado. ¡Gracias por tu compra!',
+                'cancelado': '❌ Este pedido fue cancelado'
+            };
+            const mensaje = mensajes[estado] || '';
+            return mensaje ? `<div style="background: #f0f0f0; padding: 0.75rem; border-radius: 4px; margin-top: 1rem; text-align: center; font-weight: 500;">${mensaje}</div>` : '';
+        }
+
+        function mostrarNoPedidos(mensaje) {
+            document.getElementById('pedidosContainer').innerHTML = `
+                <div class="no-pedidos">
+                    <i>📦</i>
+                    <h3>${mensaje}</h3>
+                    <a href="comida.html" class="btn-volver">Explorar Comidas</a>
+                </div>
+            `;
+        }
+
+        function filtrarPorEstado(estado) {
+            filtroActual = estado;
             
-            let pedidosFiltrados = pedidos;
+            // Actualizar botones activos
+            document.querySelectorAll('.filtro-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
 
-            if (filtroEstado) {
-                pedidosFiltrados = pedidosFiltrados.filter(pedido => pedido.estado === filtroEstado);
-            }
-
-            if (filtroCliente) {
-                pedidosFiltrados = pedidosFiltrados.filter(pedido => 
-                    (pedido.nombre_cliente || '').toLowerCase().includes(filtroCliente) ||
-                    (pedido.email_cliente || '').toLowerCase().includes(filtroCliente)
-                );
-            }
-
+            // Filtrar y mostrar
+            const pedidosFiltrados = estado 
+                ? todosPedidos.filter(p => p.estado === estado)
+                : todosPedidos;
+            
             mostrarPedidos(pedidosFiltrados);
         }
 
-        // Mostrar/Ocultar formulario
-        function mostrarFormularioNuevoPedido() {
-            document.getElementById('nuevoPedidoSection').style.display = 'block';
-            document.getElementById('nuevoPedidoSection').scrollIntoView({ behavior: 'smooth' });
-        }
-        function ocultarFormularioNuevoPedido() {
-            document.getElementById('nuevoPedidoSection').style.display = 'none';
-            document.getElementById('formNuevoPedido').reset();
-            document.getElementById('precioTotal').textContent = '0.00';
-        }
-
-        // Calcular precio total
-        function calcularPrecioTotal() {
-            const select = document.getElementById('comidaSelect');
-            const cantidad = parseInt(document.getElementById('cantidad').value) || 1;
-            const selectedOption = select.selectedOptions[0];
-            
-            if (selectedOption && selectedOption.dataset.precio) {
-                const precioUnitario = parseFloat(selectedOption.dataset.precio);
-                const total = (isNaN(precioUnitario) ? 0 : precioUnitario) * cantidad;
-                document.getElementById('precioTotal').textContent = total.toFixed(2);
-            } else {
-                document.getElementById('precioTotal').textContent = '0.00';
-            }
-        }
-
-        // Event listeners para calcular precio
-        document.getElementById('comidaSelect').addEventListener('change', calcularPrecioTotal);
-        document.getElementById('cantidad').addEventListener('input', calcularPrecioTotal);
-
-        // Crear pedido
-        document.getElementById('formNuevoPedido').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            const pedidoData = Object.fromEntries(formData.entries());
-
-            try {
-                const response = await fetch(`${API_BASE}/api/pedidos`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(pedidoData)
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData.mensaje || 'Error al crear pedido');
-                }
-
-                mostrarMensaje('Pedido creado exitosamente', 'success');
-                ocultarFormularioNuevoPedido();
-                cargarPedidos();
-                cargarEstadisticas();
-            } catch (error) {
-                console.error('Error:', error);
-                mostrarMensaje('Error al crear el pedido: ' + error.message, 'error');
-            }
-        });
-
-        // Editar pedido (abrir modal)
-        function editarPedido(id) {
-            const pedido = pedidos.find(p => p.id === id);
-            if (!pedido) return;
-
-            document.getElementById('editPedidoId').value = pedido.id;
-            document.getElementById('editNombreCliente').value = pedido.nombre_cliente || '';
-            document.getElementById('editEmailCliente').value = pedido.email_cliente || '';
-            document.getElementById('editTelefonoCliente').value = pedido.telefono_cliente || '';
-            document.getElementById('editDireccion').value = pedido.direccion || '';
-            document.getElementById('editCantidad').value = pedido.cantidad || 1;
-            document.getElementById('editEstado').value = pedido.estado || 'pendiente';
-            document.getElementById('editNotas').value = pedido.notas || '';
-
-            editandoPedidoId = id;
-            document.getElementById('modalEditarPedido').style.display = 'block';
-        }
-
-        // Cerrar modal de edición
-        function cerrarModalEditar() {
-            document.getElementById('modalEditarPedido').style.display = 'none';
-            document.getElementById('formEditarPedido').reset();
-            editandoPedidoId = null;
-        }
-
-        // Guardar edición
-        document.getElementById('formEditarPedido').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            if (!editandoPedidoId) return;
-
-            const formData = new FormData(this);
-            const pedidoData = Object.fromEntries(formData.entries());
-
-            try {
-                const response = await fetch(`${API_BASE}/api/pedidos/${editandoPedidoId}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(pedidoData)
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData.mensaje || 'Error al actualizar pedido');
-                }
-
-                mostrarMensaje('Pedido actualizado exitosamente', 'success');
-                cerrarModalEditar();
-                cargarPedidos();
-                cargarEstadisticas();
-            } catch (error) {
-                console.error('Error:', error);
-                mostrarMensaje('Error al actualizar el pedido: ' + error.message, 'error');
-            }
-        });
-
-        // Cambiar estado
-        async function cambiarEstado(id, nuevoEstado) {
-            try {
-                const response = await fetch(`${API_BASE}/api/pedidos/${id}/estado`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ estado: nuevoEstado })
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData.mensaje || 'Error al cambiar estado');
-                }
-
-                mostrarMensaje(`Estado cambiado a ${nuevoEstado}`, 'success');
-                cargarPedidos();
-                cargarEstadisticas();
-            } catch (error) {
-                console.error('Error:', error);
-                mostrarMensaje('Error al cambiar el estado: ' + error.message, 'error');
-            }
-        }
-
-        // Eliminar pedido
-        async function eliminarPedido(id) {
-            if (!confirm('¿Estás seguro de que quieres eliminar este pedido?')) return;
-
-            try {
-                const response = await fetch(`${API_BASE}/api/pedidos/${id}`, { method: 'DELETE' });
-
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData.mensaje || 'Error al eliminar pedido');
-                }
-
-                mostrarMensaje('Pedido eliminado exitosamente', 'success');
-                cargarPedidos();
-                cargarEstadisticas();
-            } catch (error) {
-                console.error('Error:', error);
-                mostrarMensaje('Error al eliminar el pedido: ' + error.message, 'error');
-            }
-        }
-
-        // Loading + mensajes
-        function mostrarLoading(mostrar) {
-            const loading = document.getElementById('loading');
-            loading.style.display = mostrar ? 'block' : 'none';
-        }
-        function mostrarMensaje(mensaje, tipo = 'info') {
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert ${tipo}`;
-            alertDiv.textContent = mensaje;
-            document.body.insertBefore(alertDiv, document.body.firstChild);
-            setTimeout(() => alertDiv.remove(), 4000);
-        }
-
-        // Cerrar modal si clic fuera
-        window.onclick = function(event) {
-            const modalEditar = document.getElementById('modalEditarPedido');
-            if (event.target === modalEditar) cerrarModalEditar();
-        }
-
-        // Auto-refresh
+        // Auto-refresh cada 30 segundos
         setInterval(() => {
-            cargarPedidos();
-            cargarEstadisticas();
+            cargarPedidosCliente();
         }, 30000);
     </script>
-
 </body>
 </html>
