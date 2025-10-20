@@ -14,12 +14,12 @@
         </div>
         <nav>
             <ul>
-                <li><a href="index.html" aria-label="Ir a inicio">Inicio</a></li>
-                <li><a href="comida.html" aria-label="Ver comidas disponibles">Comidas</a></li>
-                <li><a href="pedidos.html" aria-label="Ver pedidos">Pedidos</a></li>
-                <li><a href="#como-funciona" aria-label="Cómo funciona">Cómo Funciona</a></li>
-                <li><a href="#contacto" aria-label="Contacto">Contáctanos</a></li>
-                <li><a href="#" id="login-link" aria-label="Iniciar sesión">Iniciar Sesión</a></li>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="comida.html">Comidas</a></li>
+                <li><a href="pedidos.html">Pedidos</a></li>
+                <li><a href="#como-funciona">Cómo Funciona</a></li>
+                <li><a href="#contacto">Contáctanos</a></li>
+                <li><a href="login.html" id="login-link">Iniciar Sesión</a></li>
             </ul>
         </nav>
     </header>
@@ -28,7 +28,7 @@
         <section class="hero">
             <h2>¡Disfruta comida deliciosa y económica!</h2>
             <p>Reduce el desperdicio y ahorra comprando comida en buen estado a precios más bajos.</p>
-            <a href="comida.html" class="btn" aria-label="Ver comidas disponibles">Ver Comidas Disponibles</a>
+            <a href="comida.html" class="btn">Ver Comidas Disponibles</a>
         </section>
 
         <section class="benefits">
@@ -49,7 +49,6 @@
             </div>
         </section>
 
-        <!-- Nueva sección: Cómo Funciona -->
         <section id="como-funciona" class="como-funciona">
             <h2>¿Cómo Funciona?</h2>
             <div class="proceso-container">
@@ -76,7 +75,6 @@
             </div>
         </section>
 
-        <!-- Nueva sección: Estadísticas de Impacto -->
         <section class="impacto-section">
             <h2>Nuestro Impacto</h2>
             <div class="impacto-stats" id="impactoStats">
@@ -98,7 +96,6 @@
             </div>
         </section>
 
-        <!-- Sección de Contacto -->
         <section id="contacto" class="contacto-section">
             <h2>Contáctanos</h2>
             <div class="contacto-container">
@@ -136,100 +133,44 @@
         </section>
     </main>
 
-    <!-- Login Modal -->
-    <div id="login-modal" class="modal" role="dialog" aria-labelledby="login-title" aria-hidden="true">
-        <div class="modal-content">
-            <span class="close" aria-label="Cerrar modal">&times;</span>
-            <h2 id="login-title">Iniciar Sesión</h2>
-            <form id="login-form">
-                <label for="username">Nombre de Usuario</label>
-                <input type="text" id="username" name="username" required aria-describedby="username-error">
-
-                <label for="password">Contraseña</label>
-                <input type="password" id="password" name="password" required aria-describedby="password-error">
-
-                <button type="submit" class="btn">Iniciar sesión</button>
-                
-                <div id="login-error" class="alert" style="display: none;"></div>
-            </form>
-            <p>¿No tienes cuenta? <a href="#" id="register-link">Regístrate aquí</a></p>
-        </div>
-    </div>
-
-    <!-- Register Modal -->
-    <div id="register-modal" class="modal" role="dialog" aria-labelledby="register-title" aria-hidden="true">
-        <div class="modal-content">
-            <span class="close" aria-label="Cerrar modal">&times;</span>
-            <h2 id="register-title">Registrar Nueva Cuenta</h2>
-            <form id="register-form">
-                <label for="new-username">Nombre de Usuario</label>
-                <input type="text" id="new-username" name="username" required minlength="3">
-
-                <label for="new-password">Contraseña</label>
-                <input type="password" id="new-password" name="password" required minlength="6">
-
-                <label for="confirm-password">Confirmar Contraseña</label>
-                <input type="password" id="confirm-password" name="confirmPassword" required>
-
-                <button type="submit" class="btn">Registrar</button>
-                
-                <div id="register-error" class="alert" style="display: none;"></div>
-            </form>
-            <p>¿Ya tienes cuenta? <a href="#" id="login-from-register">Inicia sesión aquí</a></p>
-        </div>
-    </div>
-
     <footer>
         <p>&copy; 2025 Comida Sobrante. Proyecto de Responsabilidad Social - Unidad Educativa Padre Jaime Gagnon 1</p>
     </footer>
 
     <script>
-        // === BASE API (prod/local) ===
-        const API_BASE = location.hostname.endsWith('netlify.app')
-          ? 'https://proyecto-comida-backend.onrender.com' // <-- tu backend público
-          : 'http://localhost:3000';
+        const API_BASE = location.hostname.includes('netlify.app') || location.hostname.includes('github.io')
+            ? 'https://proyecto-comida-backend.onrender.com'
+            : 'http://localhost:3000';
 
-        // Modal functionality
-        const loginModal = document.getElementById('login-modal');
-        const registerModal = document.getElementById('register-modal');
-        const loginLink = document.getElementById('login-link');
-        const registerLink = document.getElementById('register-link');
-        const loginFromRegister = document.getElementById('login-from-register');
-        const closeBtns = document.querySelectorAll('.close');
-
-        // Cargar estadísticas de impacto al iniciar
         document.addEventListener('DOMContentLoaded', function() {
             cargarEstadisticasImpacto();
+            verificarSesion();
         });
 
-        // Verificar si ya está logueado al cargar la página
-        window.addEventListener('load', () => {
+        function verificarSesion() {
+            const loginLink = document.getElementById('login-link');
             if (localStorage.getItem('isLoggedIn') === 'true') {
+                const rol = localStorage.getItem('userRol');
                 loginLink.textContent = 'Dashboard';
-                loginLink.onclick = (e) => {
-                    e.preventDefault();
-                    window.location.href = 'pedidos.html';
-                };
+                loginLink.href = rol === 'vendedor' ? 'dashboard-vendedor.html' : 
+                                rol === 'admin' ? 'dashboard.html' : 'dashboard-usuario.html';
             }
-        });
+        }
 
-        // Cargar estadísticas de impacto (AJUSTADO a API_BASE)
         async function cargarEstadisticasImpacto() {
             try {
                 const response = await fetch(`${API_BASE}/api/pedidos/estadisticas/resumen`);
                 if (response.ok) {
                     const stats = await response.json();
                     
-                    const totalPedidos = stats.total_pedidos ?? 0;
+                    const totalPedidos = stats.total_pedidos || 0;
                     const totalVentas = Array.isArray(stats.por_estado)
-                      ? stats.por_estado.reduce((sum, e) => sum + parseFloat(e.total_ventas || 0), 0)
-                      : parseFloat(stats.estadisticas_hoy?.ventas_hoy || 0);
+                        ? stats.por_estado.reduce((sum, e) => sum + parseFloat(e.total_ventas || 0), 0)
+                        : parseFloat(stats.estadisticas_hoy?.ventas_hoy || 0);
 
-                    // Estimaciones de impacto ambiental
-                    const co2PorComida = 2.5; // kg CO2 promedio por comida desperdiciada
+                    const co2PorComida = 2.5;
                     const co2Evitado = totalPedidos * co2PorComida;
                     
-                    // Actualizar números con animación
                     animateNumber('comidasSalvadas', totalPedidos);
                     animateNumber('ahorroClientes', totalVentas, 'Bs ');
                     animateNumber('co2Reducido', Math.round(co2Evitado), '', ' kg');
@@ -237,212 +178,39 @@
                     throw new Error('No OK');
                 }
             } catch (error) {
-                console.log('No se pudieron cargar las estadísticas de impacto');
-                // Fallbacks visibles
+                console.log('Usando estadísticas de ejemplo');
                 animateNumber('comidasSalvadas', 156);
                 animateNumber('ahorroClientes', 2340.50, 'Bs ');
                 animateNumber('co2Reducido', 390, '', ' kg');
             }
         }
 
-        // Función para animar números
         function animateNumber(elementId, finalValue, prefix = '', suffix = '') {
             const element = document.getElementById(elementId);
             if (!element) return;
             
-            const startValue = 0;
-            const duration = 2000; // 2 segundos
-            const steps = Math.max(Math.floor(duration / 16), 1);
-            const increment = (finalValue - startValue) / steps;
-            let currentValue = startValue;
+            const duration = 2000;
+            const steps = 60;
+            const increment = finalValue / steps;
+            let current = 0;
             let step = 0;
             
             const timer = setInterval(() => {
                 step++;
-                currentValue += increment;
+                current += increment;
                 if (step >= steps) {
-                    currentValue = finalValue;
+                    current = finalValue;
                     clearInterval(timer);
                 }
                 
-                const displayValue = typeof finalValue === 'number' && finalValue % 1 !== 0 
-                    ? currentValue.toFixed(2) 
-                    : Math.floor(currentValue);
+                const display = typeof finalValue === 'number' && finalValue % 1 !== 0 
+                    ? current.toFixed(2) 
+                    : Math.floor(current);
                 
-                element.textContent = prefix + displayValue + suffix;
-            }, 16);
+                element.textContent = prefix + display + suffix;
+            }, duration / steps);
         }
 
-        // Open login modal
-        loginLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (localStorage.getItem('isLoggedIn') === 'true') {
-                window.location.href = 'pedidos.html';
-                return;
-            }
-            loginModal.style.display = 'block';
-            loginModal.setAttribute('aria-hidden', 'false');
-        });
-
-        // Switch to register modal
-        registerLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            loginModal.style.display = 'none';
-            registerModal.style.display = 'block';
-            loginModal.setAttribute('aria-hidden', 'true');
-            registerModal.setAttribute('aria-hidden', 'false');
-        });
-
-        // Switch back to login modal
-        loginFromRegister.addEventListener('click', (e) => {
-            e.preventDefault();
-            registerModal.style.display = 'none';
-            loginModal.style.display = 'block';
-            registerModal.setAttribute('aria-hidden', 'true');
-            loginModal.setAttribute('aria-hidden', 'false');
-        });
-
-        // Close modals
-        closeBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                loginModal.style.display = 'none';
-                registerModal.style.display = 'none';
-                loginModal.setAttribute('aria-hidden', 'true');
-                registerModal.setAttribute('aria-hidden', 'true');
-            });
-        });
-
-        // Close modals when clicking outside
-        window.addEventListener('click', (e) => {
-            if (e.target === loginModal || e.target === registerModal) {
-                loginModal.style.display = 'none';
-                registerModal.style.display = 'none';
-                loginModal.setAttribute('aria-hidden', 'true');
-                registerModal.setAttribute('aria-hidden', 'true');
-            }
-        });
-
-        // Handle login form submission (AJUSTADO a /auth/login)
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value;
-            const errorDiv = document.getElementById('login-error');
-            errorDiv.style.display = 'none';
-
-            if (!username || !password) {
-                showLoginError('Por favor, completa todos los campos.');
-                return;
-            }
-
-            try {
-                const submitBtn = document.querySelector('#login-form button[type="submit"]');
-                const originalText = submitBtn.textContent;
-                submitBtn.textContent = 'Iniciando sesión...';
-                submitBtn.disabled = true;
-
-                const response = await fetch(`${API_BASE}/auth/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password }),
-                });
-
-                const result = await response.json().catch(() => ({}));
-
-                if (response.ok) {
-                    localStorage.setItem('isLoggedIn', 'true');
-                    if (result.usuario) {
-                        localStorage.setItem('userId', result.usuario.id);
-                        localStorage.setItem('username', result.usuario.username);
-                    }
-                    localStorage.setItem('loginTime', String(Date.now()));
-                    
-                    showLoginSuccess('Login exitoso. Redirigiendo...');
-                    setTimeout(() => { window.location.href = 'pedidos.html'; }, 1200);
-                } else {
-                    showLoginError(result.mensaje || 'Error al iniciar sesión');
-                }
-
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-
-            } catch (error) {
-                console.error('Error de conexión:', error);
-                showLoginError('Error de conexión. Intenta de nuevo.');
-                const submitBtn = document.querySelector('#login-form button[type="submit"]');
-                submitBtn.textContent = 'Iniciar sesión';
-                submitBtn.disabled = false;
-            }
-        });
-
-        // Handle register form submission (AJUSTADO a /auth/register)
-        document.getElementById('register-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const username = document.getElementById('new-username').value.trim();
-            const password = document.getElementById('new-password').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
-            const errorDiv = document.getElementById('register-error');
-            errorDiv.style.display = 'none';
-
-            if (!username || !password || !confirmPassword) {
-                showRegisterError('Por favor, completa todos los campos.');
-                return;
-            }
-            if (username.length < 3) {
-                showRegisterError('El nombre de usuario debe tener al menos 3 caracteres.');
-                return;
-            }
-            if (password.length < 6) {
-                showRegisterError('La contraseña debe tener al menos 6 caracteres.');
-                return;
-            }
-            if (password !== confirmPassword) {
-                showRegisterError('Las contraseñas no coinciden.');
-                return;
-            }
-
-            try {
-                const submitBtn = document.querySelector('#register-form button[type="submit"]');
-                const originalText = submitBtn.textContent;
-                submitBtn.textContent = 'Registrando...';
-                submitBtn.disabled = true;
-
-                const response = await fetch(`${API_BASE}/auth/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password }),
-                });
-
-                const result = await response.json().catch(() => ({}));
-
-                if (response.ok) {
-                    showRegisterSuccess('Usuario registrado con éxito. Cambiando al login...');
-                    document.getElementById('register-form').reset();
-                    setTimeout(() => {
-                        registerModal.style.display = 'none';
-                        loginModal.style.display = 'block';
-                        registerModal.setAttribute('aria-hidden', 'true');
-                        loginModal.setAttribute('aria-hidden', 'false');
-                    }, 1500);
-                } else {
-                    showRegisterError(result.mensaje || 'Error al registrar usuario');
-                }
-
-                submitBtn.textContent = 'Registrar';
-                submitBtn.disabled = false;
-
-            } catch (error) {
-                console.error('Error de conexión:', error);
-                showRegisterError('Error de conexión. Intenta de nuevo.');
-                const submitBtn = document.querySelector('#register-form button[type="submit"]');
-                submitBtn.textContent = 'Registrar';
-                submitBtn.disabled = false;
-            }
-        });
-
-        // Handle contact form submission
         document.getElementById('contacto-form').addEventListener('submit', function(e) {
             e.preventDefault();
             const nombre = document.getElementById('contacto-nombre').value;
@@ -450,50 +218,12 @@
             this.reset();
         });
 
-        // Helpers de UI
-        function showLoginError(message) {
-            const errorDiv = document.getElementById('login-error');
-            errorDiv.textContent = message;
-            errorDiv.className = 'alert';
-            errorDiv.style.display = 'block';
-        }
-        function showLoginSuccess(message) {
-            const errorDiv = document.getElementById('login-error');
-            errorDiv.textContent = message;
-            errorDiv.className = 'alert success';
-            errorDiv.style.display = 'block';
-        }
-        function showRegisterError(message) {
-            const errorDiv = document.getElementById('register-error');
-            errorDiv.textContent = message;
-            errorDiv.className = 'alert';
-            errorDiv.style.display = 'block';
-        }
-        function showRegisterSuccess(message) {
-            const errorDiv = document.getElementById('register-error');
-            errorDiv.textContent = message;
-            errorDiv.className = 'alert success';
-            errorDiv.style.display = 'block';
-        }
-
-        // Validación en tiempo real de confirmación de contraseña
-        document.getElementById('confirm-password').addEventListener('input', function() {
-            const password = document.getElementById('new-password').value;
-            const confirmPassword = this.value;
-            if (confirmPassword && password !== confirmPassword) {
-                this.setCustomValidity('Las contraseñas no coinciden');
-                this.style.borderColor = '#d32f2f';
-            } else {
-                this.setCustomValidity('');
-                this.style.borderColor = '#ccc';
-            }
-        });
-
-        // Smooth scrolling
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (href === '#') return;
                 e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
+                const target = document.querySelector(href);
                 if (target) {
                     target.scrollIntoView({ behavior: 'smooth' });
                 }
