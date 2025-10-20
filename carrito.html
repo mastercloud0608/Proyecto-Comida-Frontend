@@ -869,27 +869,9 @@
             });
             if (!infoResponse.ok) throw new Error('Error al guardar información del cliente');
 
-            // Procesar según método de pago
-            if (metodoPago === 'tarjeta') {
-                console.log('💳 Creando PaymentIntent...');
-                const intentResponse = await fetch(`${API_BASE}/api/checkout/create-payment-intent`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'x-session-id': sessionId }
-                });
-                if (!intentResponse.ok) {
-                    const err = await intentResponse.json();
-                    throw new Error(err.mensaje || 'Error al crear la intención de pago');
-                }
-
-                const { clientSecret } = await intentResponse.json();
-                paymentIntentClientSecret = clientSecret;
-                console.log('✅ PaymentIntent creado:', clientSecret);
-                await mostrarModalPago(clientSecret, 'tarjeta');
-            } else if (metodoPago === 'efectivo') {
-                await mostrarModalPago(null, 'efectivo');
-            } else if (metodoPago === 'qr') {
-                await mostrarModalPago(null, 'qr');
-            }
+            // MODO SIMULADO - Mostrar modal directamente
+            await mostrarModalPago(null, metodoPago);
+            
         } catch (error) {
             console.error('❌ Error al procesar pago:', error);
             mostrarMensaje(error.message, 'error');
